@@ -1,5 +1,5 @@
-if
-<S> ::= a<A> | b<B>
-<A> ::= x
-<B> ::= z
-else
+se
+entao
+senao
+<S> ::= a<A> | e<A> | i<A> | o<A> | u<A>
+<A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
