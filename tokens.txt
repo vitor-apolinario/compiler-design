@@ -1,5 +1,4 @@
-se
-entao
-senao
-<S> ::= a<A> | e<A> | i<A> | o<A> | u<A> | <A>
-<A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
+<S> ::= a<S> | <A>
+<A> ::= b<A> | <B>
+<B> ::= c<B> | <C>
+<C> ::= d<C> | *

@@ -1,11 +1,28 @@
 arquivo = list(open('tokens.txt'))
 
-simbolos  = []
-estados   = []
-gramatica = {}
-tabela = {}
+simbolos    = []
+estados     = []
+inalcan     = []
+mortos      = []
+gramatica   = {}
+tabela      = {}
+epTransicao = {}
 repeticao = 0
 
+def eliminarEpTransicao():
+    for regra in tabela:
+        for transicao in tabela[regra]:
+            if transicao == '*' and tabela[regra][transicao] != []:
+                if regra not in epTransicao:
+                    epTransicao[regra] = tabela[regra][transicao]
+                else:
+                    epTransicao[regra] += tabela[regra][transicao]
+    for x in epTransicao:
+        for y in epTransicao:
+            print(y.split(), epTransicao[x])
+            if y in epTransicao[x]:
+                epTransicao[x] += epTransicao[y]
+    print("Ep: ", epTransicao)
 
 def criarAFND(): 
     for x in gramatica:
@@ -18,6 +35,7 @@ def criarAFND():
 
     for regra in gramatica:
         for transicao in gramatica[regra]:
+            #print("T: ", transicao)
             if len(transicao) == 1 and transicao.islower():                         # somente 1 terminal
                 tabela[regra][transicao].append('X')
             elif transicao[0] == '<':                                               # somente 1 regra (epsilon transição)
@@ -47,11 +65,11 @@ def trataGram(gram):                                                            
     for x in gram.split(' ::= ')[1].replace('\n', '').split(' | '):             # Adiciona os símbolos de 1 gramática
         if x[0] not in simbolos and x[0].islower():
             simbolos.append(x[0])
-    regra = gram.split(' ::= ')[0].replace('>', str(repeticao)+'>')             # Adiciona o nome da regra à gramática
+    regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')             # Adiciona o nome da regra à gramática
     if '<S> ::=' in gram:
         trataEstS(gram, 'G', 'essa string nao eh usada')
     else:
-        gramatica[regra] = gram.replace('\n','').split(' ::= ')[1].split(' | ')         # Adiciona as transições à gramática
+        gramatica[regra] = gram.replace('\n','').split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')         # Adiciona as transições à gramática
 #    print('Gramática: ', gramatica)
 
 
@@ -92,6 +110,7 @@ def main():
 #           print("Token: ", x)
             trataToken(x)
     criarAFND()
+    eliminarEpTransicao()
     print('Simbolos')
     print(simbolos)
     print('Estados')
@@ -117,3 +136,13 @@ main()
 # senao
 # <S> ::= a<A> | e<A> | i<A> | o<A> | u<A>
 # <A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
+
+#se
+#entao
+#senao
+#<S> ::= a<A> | e<A> | i<A> | o<A> | u<A> | <A>
+#<A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
+
+#<S> ::= a<S> | <A>
+#<A> ::= b<A> | <B>
+#<B> ::= c<B> | *
