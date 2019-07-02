@@ -13,14 +13,18 @@ def criarAFND():
         estados.append(x)
         for y in simbolos:
             tabela[x][y] = []
+        tabela[x]['*'] = []       # coluna do epsilon verificar
 #    print('Tabela: ', tabela)
 
     for regra in gramatica:
         for transicao in gramatica[regra]:
-            if len(transicao) == 1 and transicao.islower():
+            if len(transicao) == 1 and transicao.islower():                         # somente 1 terminal
                 tabela[regra][transicao].append('X')
-            elif transicao != '*':
+            elif transicao[0] == '<':                                               # somente 1 regra (epsilon transição)
+                tabela[regra]['*'].append(transicao.split('<')[1][:-1])
+            elif transicao != '*':                                                  # caso geral
                 tabela[regra][transicao[0]].append(transicao.split('<')[1][:-1])
+
     print('\nTabela: ', tabela)
 
 
