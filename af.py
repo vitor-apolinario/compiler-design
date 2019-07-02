@@ -20,9 +20,9 @@ def criarAFND():
             if len(transicao) == 1 and transicao.islower():
                 tabela[regra][transicao].append('X')
             elif transicao != '*':
-                tabela[regra][transicao[0]].append(transicao[1]+str(repeticao))
+                tabela[regra][transicao[0]].append(transicao.split('<')[1][:-1])
     print('\nTabela: ', tabela)
-    
+
 
 def trataEstS(sentenca, op, proxregra):
     global repeticao
@@ -54,7 +54,8 @@ def trataGram(gram):                                                            
 def trataToken(token):                                                            # Função usada para tratar tokens
     cop = token.replace('\n','')
     token = list(token)
-    token.remove('\n')
+    if '\n' in token:
+        token.remove('\n')
     for x in range(len(token)):
         # print("Token: ", token[x])
         if token[x] not in simbolos and token[x].islower():                                 # Se o símbolo ainda não existe, adiciona
@@ -70,9 +71,12 @@ def trataToken(token):                                                          
             trataEstS(token[x], 'T', regra)
         elif x == len(token)-1:                                                             # Se for o ultimo, é terminal e não leva à outro estado
             gramatica[regra] = token[x].split()
+            # se os estados finais forem necessários use o bloco abaixo
+            # gramatica[regra] = str(token[x] + '<' + cop.upper() + '*>').split()
+            # gramatica['<' + cop.upper() + '*>'] = []
         # pelo que me parece o caso abaixo não deve acontecer
         elif regra in gramatica:                                                            # (??) Se a regra já existir será concatenada com simbolo+SIMBOLO+repeticao (??)
-            gramatica[regra] += str(token[x]+token[x].upper()+str(repeticao)).split()
+            gramatica[regra] += str(token[x] + token[x].upper() + str(repeticao)).split()
         else:                                                                               # se for um token entre o primeiro e o ultimo => token+proximaregra
             gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>' ).split()
 
@@ -85,7 +89,6 @@ def main():
         else:
 #           print("Token: ", x)
             trataToken(x)
-#    print('Simbol: ', simbolos)
     criarAFND()
     print('Simbolos')
     print(simbolos)
@@ -93,8 +96,8 @@ def main():
     print(estados)
     print('Gramática')
     print(gramatica)
-    print('Tabela')
-    print(tabela)
+    # print('Tabela')
+    # print(tabela)
 
 
 main()
@@ -106,3 +109,9 @@ main()
 # <A> ::= x
 # <B> ::= z
 # else
+
+# se
+# entao
+# senao
+# <S> ::= a<A> | e<A> | i<A> | o<A> | u<A>
+# <A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
