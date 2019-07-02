@@ -70,10 +70,8 @@ def trataToken(token):                                                          
         if x == 0 and x != len(token)-1:                                                    # Se for o primeiro e não último
             trataEstS(token[x], 'T', regra)
         elif x == len(token)-1:                                                             # Se for o ultimo, é terminal e não leva à outro estado
-            gramatica[regra] = token[x].split()
-            # se os estados finais forem necessários use o bloco abaixo
-            # gramatica[regra] = str(token[x] + '<' + cop.upper() + '*>').split()
-            # gramatica['<' + cop.upper() + '*>'] = []
+            gramatica[regra] = str(token[x] + '<' + cop.upper() + '*>').split()
+            gramatica['<' + cop.upper() + '*>'] = []
         # pelo que me parece o caso abaixo não deve acontecer
         elif regra in gramatica:                                                            # (??) Se a regra já existir será concatenada com simbolo+SIMBOLO+repeticao (??)
             gramatica[regra] += str(token[x] + token[x].upper() + str(repeticao)).split()
