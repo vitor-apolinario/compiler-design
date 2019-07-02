@@ -36,14 +36,21 @@ def criarAFND():
     for regra in gramatica:
         for transicao in gramatica[regra]:
             #print("T: ", transicao)
-            if len(transicao) == 1 and transicao.islower():                         # somente 1 terminal
+            if len(transicao) == 1 and transicao.islower():                                                             # somente 1 terminal
                 tabela[regra][transicao].append('X')
-            elif transicao[0] == '<':                                               # somente 1 regra (epsilon transição)
+            elif transicao[0] == '<':                                                                                   # somente 1 regra (epsilon transição)
                 tabela[regra]['*'].append(transicao.split('<')[1][:-1])
-            elif transicao != '*':                                                  # caso geral
+            elif transicao != '*':                                                                                      # caso geral
                 tabela[regra][transicao[0]].append(transicao.split('<')[1][:-1])
 
     print('\nTabela: ', tabela)
+
+
+def criaSn(S):
+    global repeticao
+    if 'S' + str(repeticao) in gramatica:                                                                               # se já houver Sn na gramatica abortar
+        return
+    gramatica['S' + str(repeticao)] = S.replace('\n','').split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')
 
 
 def trataEstS(sentenca, op, proxregra):
@@ -61,26 +68,31 @@ def trataEstS(sentenca, op, proxregra):
     # print("GP: ", gramatica)
     
 
-def trataGram(gram):                                                            # Função usada para tratar gramáticas
-    for x in gram.split(' ::= ')[1].replace('\n', '').split(' | '):             # Adiciona os símbolos de 1 gramática
+def trataGram(gram , S):                                                                                                # Função usada para tratar gramáticas
+    for x in gram.split(' ::= ')[1].replace('\n', '').split(' | '):
         if x[0] not in simbolos and x[0].islower():
             simbolos.append(x[0])
-    regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')             # Adiciona o nome da regra à gramática
+    regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')                                        # Adiciona o nome da regra à gramática
+
     if '<S> ::=' in gram:
         trataEstS(gram, 'G', 'essa string nao eh usada')
+        if '<S>' in gram.replace('\n', '').split(' ::= ')[1]:
+            criaSn(S)
     else:
+        if '<S>' in gram.replace('\n', '').split(' ::= ')[1]:
+            criaSn(S)
         gramatica[regra] = gram.replace('\n','').split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')         # Adiciona as transições à gramática
 #    print('Gramática: ', gramatica)
 
 
-def trataToken(token):                                                            # Função usada para tratar tokens
+def trataToken(token):                                                                                                  # Função usada para tratar tokens
     cop = token.replace('\n','')
     token = list(token)
     if '\n' in token:
         token.remove('\n')
     for x in range(len(token)):
         # print("Token: ", token[x])
-        if token[x] not in simbolos and token[x].islower():                                 # Se o símbolo ainda não existe, adiciona
+        if token[x] not in simbolos and token[x].islower():                                                             # Se o símbolo ainda não existe, adiciona
             simbolos.append(token[x])
             
         if x == 0:
@@ -89,22 +101,25 @@ def trataToken(token):                                                          
             regra = '<' + cop.upper() + str(x) + '>'
 
         # é possível um token onde |token| = 1? se sim, falta tratar
-        if x == 0 and x != len(token)-1:                                                    # Se for o primeiro e não último
+        if x == 0 and x != len(token)-1:                                                                                # Se for o primeiro e não último
             trataEstS(token[x], 'T', regra)
-        elif x == len(token)-1:                                                             # Se for o ultimo, é terminal e não leva à outro estado
+        elif x == len(token)-1:                                                                                         # Se for o ultimo, é terminal e não leva à outro estado
             gramatica[regra] = str(token[x] + '<' + cop.upper() + '*>').split()
             gramatica['<' + cop.upper() + '*>'] = []
         # pelo que me parece o caso abaixo não deve acontecer
-        elif regra in gramatica:                                                            # (??) Se a regra já existir será concatenada com simbolo+SIMBOLO+repeticao (??)
+        elif regra in gramatica:                                                                                        # (??) Se a regra já existir será concatenada com simbolo+SIMBOLO+repeticao (??)
             gramatica[regra] += str(token[x] + token[x].upper() + str(repeticao)).split()
-        else:                                                                               # se for um token entre o primeiro e o ultimo => token+proximaregra
+        else:                                                                                                           # se for um token entre o primeiro e o ultimo => token+proximaregra
             gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>' ).split()
 
 
 def main():
+    estadoinicial = ''
     for x in arquivo:
-        if '::=' in x:          
-            trataGram(x)
+        if '<S> ::=' in x:
+            estadoinicial = x
+        if '::=' in x:
+            trataGram(x, estadoinicial)
 #           print('Gramática: ', x)
         else:
 #           print("Token: ", x)
