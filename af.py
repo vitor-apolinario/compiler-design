@@ -19,10 +19,17 @@ def eliminarEpTransicao():
                     epTransicao[regra] += tabela[regra][transicao]
     for x in epTransicao:
         for y in epTransicao:
-            print(y.split(), epTransicao[x])
+#            print(y.split(), epTransicao[x])
             if y in epTransicao[x]:
                 epTransicao[x] += epTransicao[y]
-    print("Ep: ", epTransicao)
+    print("\n\nEp: ", epTransicao)
+    for conjunto in epTransicao:
+        for tran in tabela[conjunto]:
+            for epT in epTransicao[conjunto]:
+                tabela[conjunto][tran] += tabela[epT][tran]
+                if tran == '*':
+                    tabela[conjunto][tran] = [ ]
+    print("Tab2: ", tabela)
 
 def criarAFND(): 
     for x in gramatica:
