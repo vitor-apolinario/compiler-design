@@ -1,3 +1,4 @@
+import csv
 arquivo = list(open('tokens.txt'))
 
 simbolos    = []
@@ -11,17 +12,18 @@ repeticao = 0
 
 def eliminarEpTransicao():
     for regra in tabela:
-        for transicao in tabela[regra]:
-            if transicao == '*' and tabela[regra][transicao] != []:
-                if regra not in epTransicao:
-                    epTransicao[regra] = tabela[regra][transicao]
-                else:
-                    epTransicao[regra] += tabela[regra][transicao]
+        if tabela[regra]['*'] != []:
+            if regra not in epTransicao:
+                epTransicao[regra] = tabela[regra]['*']
+            else:
+                epTransicao[regra] += tabela[regra]['*']
+
     for x in epTransicao:
         for y in epTransicao:
 #            print(y.split(), epTransicao[x])
             if y in epTransicao[x]:
                 epTransicao[x] += epTransicao[y]
+
     print("\n\nEp: ", epTransicao)
     for conjunto in epTransicao:
         for tran in tabela[conjunto]:
@@ -31,7 +33,7 @@ def eliminarEpTransicao():
                     tabela[conjunto][tran] = [ ]
     print("Tab2: ", tabela)
 
-def criarAFND(): 
+def criarAF():
     for x in gramatica:
         tabela[x] = {}
         estados.append(x)
@@ -120,6 +122,17 @@ def trataToken(token):                                                          
             gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>' ).split()
 
 
+def criarArquivo():
+    with open('afnd.csv', 'w', newline='') as f:
+        # fields = ['nomeregra'] + list(tabela['S'].keys())
+        w = csv.writer(f)
+        copydict = tabela.copy()
+        w.writerow(list(copydict['S'].keys()) + ['regra'])
+        for x in copydict:
+            copydict[x]['nomeregra'] = x
+            w.writerow(copydict[x].values())
+
+
 def main():
     estadoinicial = ''
     for x in arquivo:
@@ -131,8 +144,10 @@ def main():
         else:
 #           print("Token: ", x)
             trataToken(x)
-    criarAFND()
+    criarAF()
     eliminarEpTransicao()
+
+
     print('Simbolos')
     print(simbolos)
     print('Estados')
@@ -141,6 +156,8 @@ def main():
     print(gramatica)
     # print('Tabela')
     # print(tabela)
+
+    criarArquivo()
 
 
 main()
