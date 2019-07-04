@@ -1,27 +1,68 @@
+import csv
+import copy
 arquivo = list(open('tokens.txt'))
 
 simbolos    = []
 estados     = []
 inalcan     = []
 mortos      = []
+novos       = []
 gramatica   = {}
 tabela      = {}
 epTransicao = {}
 repeticao = 0
 
+
+def criaNovos(nstates):
+    for x in nstates:
+        tabela[x] = {}
+        estados.append(x)
+        for y in simbolos:
+            tabela[x][y] = []
+        tabela[x]['*'] = []
+
+    for state in nstates:
+        estadosjuntar = sorted(state.split(':'))
+        for x in estadosjuntar:
+            if x == 'X':                                                                                                # X ainda não nos é útil
+                continue
+            for simbolo in simbolos:
+                for transition in tabela[x][simbolo]:
+                    if not tabela[state][simbolo].__contains__(transition):
+                        tabela[state][simbolo].append(transition)
+    determizina()
+
+
+def determizina():
+    novosestados = []
+    for regra in tabela:
+        for producao in tabela[regra]:
+            if len(tabela[regra][producao]) > 1:
+                print('indeterminismo em: regra', regra, '; produzindo', producao, ' -> ', tabela[regra][producao], 'ele virará um novo estado')
+                novo = ''
+                for estado in tabela[regra][producao]:                                                                  # concatena para saber o nome do novo estado
+                    novo += estado  + ':'
+                novo = novo[:-1]                                                                                        # remove : do final
+                if not novosestados.__contains__(novo) and novo:                                                        # (if '') retorna falso
+                    novosestados.append(novo)
+                tabela[regra][producao] = novo.split()
+    if novosestados:
+        criaNovos(novosestados)
+
+
 def eliminarEpTransicao():
     for regra in tabela:
-        for transicao in tabela[regra]:
-            if transicao == '*' and tabela[regra][transicao] != []:
-                if regra not in epTransicao:
-                    epTransicao[regra] = tabela[regra][transicao]
-                else:
-                    epTransicao[regra] += tabela[regra][transicao]
+        if tabela[regra]['*'] != []:
+            if regra not in epTransicao:
+                epTransicao[regra] = tabela[regra]['*']
+            else:
+                epTransicao[regra] += tabela[regra]['*']
+
     for x in epTransicao:
         for y in epTransicao:
-#            print(y.split(), epTransicao[x])
             if y in epTransicao[x]:
                 epTransicao[x] += epTransicao[y]
+
     print("\n\nEp: ", epTransicao)
     for conjunto in epTransicao:
         for tran in tabela[conjunto]:
@@ -31,18 +72,16 @@ def eliminarEpTransicao():
                     tabela[conjunto][tran] = [ ]
     print("Tab2: ", tabela)
 
-def criarAFND(): 
+def criarAF():
     for x in gramatica:
         tabela[x] = {}
         estados.append(x)
         for y in simbolos:
             tabela[x][y] = []
         tabela[x]['*'] = []       # coluna do epsilon verificar
-#    print('Tabela: ', tabela)
 
     for regra in gramatica:
         for transicao in gramatica[regra]:
-            #print("T: ", transicao)
             if len(transicao) == 1 and transicao.islower():                                                             # somente 1 terminal
                 tabela[regra][transicao].append('X')
             elif transicao[0] == '<':                                                                                   # somente 1 regra (epsilon transição)
@@ -72,8 +111,7 @@ def trataEstS(sentenca, op, proxregra):
         gramatica['S'] += str(sentenca + proxregra).split()
     elif 'S' not in gramatica and op == 'T':
         gramatica['S'] = str(sentenca + proxregra).split()
-    # print("GP: ", gramatica)
-    
+
 
 def trataGram(gram , S):                                                                                                # Função usada para tratar gramáticas
     for x in gram.split(' ::= ')[1].replace('\n', '').split(' | '):
@@ -89,7 +127,6 @@ def trataGram(gram , S):                                                        
         if '<S>' in gram.replace('\n', '').split(' ::= ')[1]:
             criaSn(S)
         gramatica[regra] = gram.replace('\n','').split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')         # Adiciona as transições à gramática
-#    print('Gramática: ', gramatica)
 
 
 def trataToken(token):                                                                                                  # Função usada para tratar tokens
@@ -98,7 +135,6 @@ def trataToken(token):                                                          
     if '\n' in token:
         token.remove('\n')
     for x in range(len(token)):
-        # print("Token: ", token[x])
         if token[x] not in simbolos and token[x].islower():                                                             # Se o símbolo ainda não existe, adiciona
             simbolos.append(token[x])
             
@@ -120,6 +156,17 @@ def trataToken(token):                                                          
             gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>' ).split()
 
 
+def criarArquivo():
+    with open('afnd.csv', 'w', newline='') as f:
+        # fields = ['nomeregra'] + list(tabela['S'].keys())
+        w = csv.writer(f)
+        copydict = copy.deepcopy(tabela)
+        w.writerow(list(copydict['S'].keys()) + ['regra'])
+        for x in copydict:
+            copydict[x]['nomeregra'] = x
+            w.writerow(copydict[x].values())
+
+
 def main():
     estadoinicial = ''
     for x in arquivo:
@@ -127,18 +174,18 @@ def main():
             estadoinicial = x
         if '::=' in x:
             trataGram(x, estadoinicial)
-#           print('Gramática: ', x)
         else:
-#           print("Token: ", x)
             trataToken(x)
-    criarAFND()
-    eliminarEpTransicao()
-    print('Simbolos')
-    print(simbolos)
-    print('Estados')
-    print(estados)
-    print('Gramática')
-    print(gramatica)
+    criarAF()
+    # eliminarEpTransicao()
+    determizina()
+    criarArquivo()
+    # print('Simbolos')
+    # print(simbolos)
+    # print('Estados')
+    # print(estados)
+    # print('Gramática')
+    # print(gramatica)
     # print('Tabela')
     # print(tabela)
 
