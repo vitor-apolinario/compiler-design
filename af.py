@@ -12,7 +12,6 @@ tabela      = {}
 epTransicao = {}
 repeticao = 0
 
-
 def criaNovos(nstates):
     for x in nstates:
         tabela[x] = {}
@@ -21,10 +20,27 @@ def criaNovos(nstates):
             tabela[x][y] = []
         tabela[x]['*'] = []
 
-    for state in nstates:
+
+def criaNovos(nstates):
+    loop = []
+    loop.extend(nstates)                                                         # Necessário para evitar o problema de alterar o for in e não percorrer todos os valores
+    for x in loop:
+        altera = 1                                                               # Identificador para saber se um novo estado já está na tabela
+        for regra in tabela:                                                    
+            if x in regra:                                                       # Se o novoEstado estiver na tabela, não será alterado nada e ele será removido da lista
+                altera = 0
+                nstates.remove(x)
+        if altera:                                                               # Se o estado não existe na tabela, será criado
+            tabela[x] = {}
+            estados.append(x)
+            for y in simbolos:
+                tabela[x][y] = []
+            tabela[x]['*'] = []
+
+    for state in nstates:                                                        # Para os estados ainda não criados
         estadosjuntar = sorted(state.split(':'))
         for x in estadosjuntar:
-            if x == 'X':                                                                                                # X ainda não nos é útil
+            if x == 'X':                                                         # X ainda não nos é útil
                 continue
             for simbolo in simbolos:
                 for transition in tabela[x][simbolo]:
@@ -37,19 +53,29 @@ def determizina():
     novosestados = []
     for regra in tabela:
         for producao in tabela[regra]:
-            if len(tabela[regra][producao]) > 1:
-                print('indeterminismo em: regra', regra, '; produzindo', producao, ' -> ', tabela[regra][producao], 'ele virará um novo estado')
-                novo = ''
-                for estado in tabela[regra][producao]:                                                                  # concatena para saber o nome do novo estado
-                    novo += estado  + ':'
-                novo = novo[:-1]                                                                                        # remove : do final
-                if not novosestados.__contains__(novo) and novo:                                                        # (if '') retorna falso
+            if len(tabela[regra][producao]) > 1:                                     # Caso tenho indeterminismo
+                novo = ''                                                            # Se o novo estado é resultante da formação do AFND
+                novoDet = []                                                         # Se o estado é resultante de uma tentativa de determinização
+                op = 2                                                               # Identifica se deve ser usado novo ou novoDet
+                for estado in tabela[regra][producao]:                               # Concatena para saber o nome do novo estado
+                    if ':' in estado:                                                # Se tiver ':' será usado novoDet, nele é salvo os estados splitados por ':'. São unicos, no if
+                        for aux in estado.split(':'):
+                            if aux not in novoDet:
+                                novoDet.append(aux)
+                        op = 1
+                    else:                                                            # Se for na primeira vez, não tem ':' então o método permanece o mesmo
+                        novo += estado  + ':'
+                        op = 0
+                if op:                                                               # O novoDet é unido em uma string, separando as posições por ':'
+                    novo = ':'.join(novoDet)                                         # Ex: ['A1', 'B1'] -> A1:B1
+                elif op == 0:
+                    novo = novo[:-1]                                                 # remove : do final
+                if not novosestados.__contains__(novo) and novo:                     # (if '') retorna falso
                     novosestados.append(novo)
                 tabela[regra][producao] = novo.split()
     if novosestados:
         criaNovos(novosestados)
-
-
+    
 def eliminarEpTransicao():
     for regra in tabela:
         if tabela[regra]['*'] != []:
@@ -177,8 +203,10 @@ def main():
         else:
             trataToken(x)
     criarAF()
+    print("\n\nAFND: ", tabela)
     # eliminarEpTransicao()
     determizina()
+    print("\n\nAFD: ", tabela)
     criarArquivo()
     # print('Simbolos')
     # print(simbolos)
