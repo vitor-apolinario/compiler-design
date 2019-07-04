@@ -16,11 +16,9 @@ def eliminarInal():                         # Percorre a tabela e remove quem n�
     loop = {}
     loop.update(tabela)
     for regra in loop:
-        if str(tabela[regra])[2:-2] not in alcan:
-            print("\nTab: ", str(tabela[regra])[2:-2])
-            print("Del: ", tabela[regra])
+        if regra not in alcan:
             del tabela[regra];
-
+                
 
 def buscarAlcan(estado):                    # Percorre os estados da tabela recursivamente e se em suas transações ainda tiver um estado que não está em alcan
     if estado not in alcan:         
