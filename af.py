@@ -12,14 +12,6 @@ tabela      = {}
 epTransicao = {}
 repeticao = 0
 
-def criaNovos(nstates):
-    for x in nstates:
-        tabela[x] = {}
-        estados.append(x)
-        for y in simbolos:
-            tabela[x][y] = []
-        tabela[x]['*'] = []
-
 
 def criaNovos(nstates):
     loop = []
@@ -54,22 +46,20 @@ def determizina():
     for regra in tabela:
         for producao in tabela[regra]:
             if len(tabela[regra][producao]) > 1:                                     # Caso tenho indeterminismo
-                novo = ''                                                            # Se o novo estado é resultante da formação do AFND
-                novoDet = []                                                         # Se o estado é resultante de uma tentativa de determinização
-                op = 2                                                               # Identifica se deve ser usado novo ou novoDet
-                for estado in tabela[regra][producao]:                               # Concatena para saber o nome do novo estado
-                    if ':' in estado:                                                # Se tiver ':' será usado novoDet, nele é salvo os estados splitados por ':'. São unicos, no if
+                novo = []                                                            # Estados individuais, que geram o indet
+                for estado in tabela[regra][producao]:
+                    if ':' in estado:                                                # Se tiver ':' será dividido e adicionado um à um
                         for aux in estado.split(':'):
-                            if aux not in novoDet:
-                                novoDet.append(aux)
-                        op = 1
-                    else:                                                            # Se for na primeira vez, não tem ':' então o método permanece o mesmo
-                        novo += estado  + ':'
-                        op = 0
-                if op:                                                               # O novoDet é unido em uma string, separando as posições por ':'
-                    novo = ':'.join(novoDet)                                         # Ex: ['A1', 'B1'] -> A1:B1
-                elif op == 0:
-                    novo = novo[:-1]                                                 # remove : do final
+                            if aux not in novo:
+                                novo.append(aux)
+                    else:                                                            # Se for na primeira vez, não tem ':', então o estado é adicionado à lista estados
+                        if not estado in novo:
+                            novo.append(estado)
+
+                if novo:                                                             # se novo não for vazio
+                    novo = sorted(novo)
+                    novo = ':'.join(novo)                                            # Ex: ['A1', 'B1'] -> A1:B1
+
                 if not novosestados.__contains__(novo) and novo:                     # (if '') retorna falso
                     novosestados.append(novo)
                 tabela[regra][producao] = novo.split()
