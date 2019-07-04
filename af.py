@@ -114,13 +114,13 @@ def criarAF():
         tabela[x]['*'] = []       # coluna do epsilon verificar
 
     for regra in gramatica:
-        for transicao in gramatica[regra]:
-            if len(transicao) == 1 and transicao.islower():                                                             # somente 1 terminal
-                tabela[regra][transicao].append('X')
-            elif transicao[0] == '<':                                                                                   # somente 1 regra (epsilon transição)
-                tabela[regra]['*'].append(transicao.split('<')[1][:-1])
-            elif transicao != '*':                                                                                      # caso geral
-                tabela[regra][transicao[0]].append(transicao.split('<')[1][:-1])
+        for producao in gramatica[regra]:
+            if len(producao) == 1 and producao.islower():                                                             # somente 1 terminal
+                tabela[regra][producao].append('X')
+            elif producao[0] == '<':                                                                                   # somente 1 regra (epsilon transição)
+                tabela[regra]['*'].append(producao.split('<')[1][:-1])
+            elif producao != '*':                                                                                      # caso geral
+                tabela[regra][producao[0]].append(producao.split('<')[1][:-1])
 
     print('\nTabela: ', tabela)
 
@@ -172,16 +172,16 @@ def trataToken(token):                                                          
             simbolos.append(token[x])
             
         if x == 0:
-            regra = '<' + cop.upper() + '1>'
+            regra = cop.upper() + '1'
         else:
-            regra = '<' + cop.upper() + str(x) + '>'
+            regra = cop.upper() + str(x)
 
         # é possível um token onde |token| = 1? se sim, falta tratar
         if x == 0 and x != len(token)-1:                                                                                # Se for o primeiro e não último
-            trataEstS(token[x], 'T', regra)
+            trataEstS(token[x], 'T', '<' + regra + '>')
         elif x == len(token)-1:                                                                                         # Se for o ultimo, é terminal e não leva à outro estado
-            gramatica[regra] = str(token[x] + '<' + cop.upper() + '*>').split()
-            gramatica['<' + cop.upper() + '*>'] = []
+            gramatica[regra] = str(token[x] + '<' + cop.upper() + '>').split()
+            gramatica[cop.upper()] = []
         # pelo que me parece o caso abaixo não deve acontecer
         elif regra in gramatica:                                                                                        # (??) Se a regra já existir será concatenada com simbolo+SIMBOLO+repeticao (??)
             gramatica[regra] += str(token[x] + token[x].upper() + str(repeticao)).split()
@@ -211,22 +211,14 @@ def main():
             trataToken(x)
     criarAF()
     print("\n\nAFND: ", tabela)
-    # eliminarEpTransicao()
+    eliminarEpTransicao()
     determizina()
     print("\n\nAFD: ", tabela)
     buscarAlcan('S')
     print('\n\nAlcan: ', alcan)
     eliminarInal()
     print("\n\nVIVOS: ", tabela)
-    # criarArquivo()
-    # print('Simbolos')
-    # print(simbolos)
-    # print('Estados')
-    # print(estados)
-    # print('Gramática')
-    # print(gramatica)
-    # print('Tabela')
-    # print(tabela)
+    criarArquivo()
 
 
 main()
