@@ -4,13 +4,53 @@ arquivo = list(open('tokens.txt'))
 
 simbolos    = []
 estados     = []
-inalcan     = []
+alcan       = []
 mortos      = []
 novos       = []
 gramatica   = {}
 tabela      = {}
 epTransicao = {}
 repeticao = 0
+
+def eliminarInal():                         # Percorre a tabela e remove quem não estiver na lista de alcançáveis
+    loop = {}
+    loop.update(tabela)
+    for regra in loop:
+        if str(tabela[regra])[2:-2] not in alcan:
+            print("\nTab: ", str(tabela[regra])[2:-2])
+            print("Del: ", tabela[regra])
+            del tabela[regra];
+
+
+def buscarAlcan(estado):                    # Percorre os estados da tabela recursivamente e se em suas transações ainda tiver um estado que não está em alcan
+    if estado not in alcan:         
+        alcan.append(estado)
+        for tran in tabela[estado]:
+            if str(tabela[estado][tran])[2:-2] != '':
+                buscarAlcan(str(tabela[estado][tran])[2:-2])
+
+
+def eliminarEpTransicao():
+    for regra in tabela:
+        if tabela[regra]['*'] != []:
+            if regra not in epTransicao:
+                epTransicao[regra] = tabela[regra]['*']
+            else:
+                epTransicao[regra] += tabela[regra]['*']
+
+    for x in epTransicao:
+        for y in epTransicao:
+            if y in epTransicao[x]:
+                epTransicao[x] += epTransicao[y]
+
+    print("\n\nEp: ", epTransicao)
+    for conjunto in epTransicao:
+        for tran in tabela[conjunto]:
+            for epT in epTransicao[conjunto]:
+                tabela[conjunto][tran] += tabela[epT][tran]
+                if tran == '*':
+                    tabela[conjunto][tran] = [ ]
+    print("Tab2: ", tabela)
 
 
 def criaNovos(nstates):
@@ -66,27 +106,6 @@ def determizina():
     if novosestados:
         criaNovos(novosestados)
     
-def eliminarEpTransicao():
-    for regra in tabela:
-        if tabela[regra]['*'] != []:
-            if regra not in epTransicao:
-                epTransicao[regra] = tabela[regra]['*']
-            else:
-                epTransicao[regra] += tabela[regra]['*']
-
-    for x in epTransicao:
-        for y in epTransicao:
-            if y in epTransicao[x]:
-                epTransicao[x] += epTransicao[y]
-
-    print("\n\nEp: ", epTransicao)
-    for conjunto in epTransicao:
-        for tran in tabela[conjunto]:
-            for epT in epTransicao[conjunto]:
-                tabela[conjunto][tran] += tabela[epT][tran]
-                if tran == '*':
-                    tabela[conjunto][tran] = [ ]
-    print("Tab2: ", tabela)
 
 def criarAF():
     for x in gramatica:
@@ -197,7 +216,11 @@ def main():
     # eliminarEpTransicao()
     determizina()
     print("\n\nAFD: ", tabela)
-    criarArquivo()
+    buscarAlcan('S')
+    print('\n\nAlcan: ', alcan)
+    eliminarInal()
+    print("\n\nVIVOS: ", tabela)
+    # criarArquivo()
     # print('Simbolos')
     # print(simbolos)
     # print('Estados')
