@@ -1,6 +1,7 @@
-if
-<S> ::= a<A> | b<B> | b | c<S> | c | *
-<A> ::= a<S> | a | b<C> | c<A>
-<B> ::= a<A> | c<B> | c<S> | c
-<C> ::= a<S> | a | c<A> | c<C>
-else
+<S> ::= a<A> | a | b | c<C> | b<D>
+<A> ::= a<B> | b<A> | c<B> | *
+<B> ::= a<A> | b<B> | c<A> | a | c
+<C> ::= a<C> | b<D> | c<C> | b
+<D> ::= a<D> | b<C> | c<C> | * | c | a
+<E> ::= a<C> | b<F> | a
+<F> ::= b<E> | c<B> | b

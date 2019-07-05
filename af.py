@@ -1,5 +1,4 @@
 import csv
-import copy
 arquivo = list(open('tokens.txt'))
 
 simbolos    = []
@@ -24,7 +23,7 @@ def buscarAlcan(estado):                    # Percorre os estados da tabela recu
     if estado not in alcan:         
         alcan.append(estado)
         for tran in tabela[estado]:
-            if str(tabela[estado][tran])[2:-2] != '':
+            if str(tabela[estado][tran])[2:-2] != '' and str(tabela[estado][tran])[2:-2] != 'X':
                 buscarAlcan(str(tabela[estado][tran])[2:-2])
 
 
@@ -52,20 +51,12 @@ def eliminarEpTransicao():
 
 
 def criaNovos(nstates):
-    loop = []
-    loop.extend(nstates)                                                         # Necessário para evitar o problema de alterar o for in e não percorrer todos os valores
-    for x in loop:
-        altera = 1                                                               # Identificador para saber se um novo estado já está na tabela
-        for regra in tabela:                                                    
-            if x in regra:                                                       # Se o novoEstado estiver na tabela, não será alterado nada e ele será removido da lista
-                altera = 0
-                nstates.remove(x)
-        if altera:                                                               # Se o estado não existe na tabela, será criado
-            tabela[x] = {}
-            estados.append(x)
-            for y in simbolos:
-                tabela[x][y] = []
-            tabela[x]['*'] = []
+    for x in nstates:
+        tabela[x] = {}
+        estados.append(x)
+        for y in simbolos:
+            tabela[x][y] = []
+        tabela[x]['*'] = []
 
     for state in nstates:                                                        # Para os estados ainda não criados
         estadosjuntar = sorted(state.split(':'))
@@ -98,7 +89,7 @@ def determizina():
                     novo = sorted(novo)
                     novo = ':'.join(novo)                                            # Ex: ['A1', 'B1'] -> A1:B1
 
-                if not novosestados.__contains__(novo) and novo:                     # (if '') retorna falso
+                if novo and not novo in novosestados and not novo in list(tabela.keys()):
                     novosestados.append(novo)
                 tabela[regra][producao] = novo.split()
     if novosestados:
@@ -193,11 +184,23 @@ def criarArquivo():
     with open('afnd.csv', 'w', newline='') as f:
         # fields = ['nomeregra'] + list(tabela['S'].keys())
         w = csv.writer(f)
-        copydict = copy.deepcopy(tabela)
+        copydict = {}
+        copydict.update(tabela)
         w.writerow(list(copydict['S'].keys()) + ['regra'])
         for x in copydict:
             copydict[x]['nomeregra'] = x
             w.writerow(copydict[x].values())
+
+
+def criarEstadoErro():
+    tabela['€'] = {}
+    for y in simbolos:
+        tabela['€'][y] = []
+    tabela['€']['*'] = []
+    for regra in tabela:
+        for simbolo in tabela[regra]:
+            if not tabela[regra][simbolo]:
+                tabela[regra][simbolo] = ['€']
 
 
 def main():
@@ -218,6 +221,7 @@ def main():
     print('\n\nAlcan: ', alcan)
     eliminarInal()
     print("\n\nVIVOS: ", tabela)
+    criarEstadoErro()
     criarArquivo()
 
 
@@ -246,3 +250,10 @@ main()
 #<S> ::= a<S> | <A>
 #<A> ::= b<A> | <B>
 #<B> ::= c<B> | *
+
+# if
+# <S> ::= a<A> | b<B> | b | c<S> | c | *
+# <A> ::= a<S> | a | b<C> | c<A>
+# <B> ::= a<A> | c<B> | c<S> | c
+# <C> ::= a<S> | a | c<A> | c<C>
+# else
