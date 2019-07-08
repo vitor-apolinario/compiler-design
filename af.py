@@ -1,56 +1,43 @@
 import csv
 arquivo = list(open('tokens.txt'))
 
-simbolos    = []
-estados     = []
-alcan       = []
-mortos      = []
-novos       = []
-gramatica   = {}
-tabela      = {}
+simbolos = []
+estados = []
+alcan = []
+mortos = []
+novos = []
+gramatica = {}
+tabela = {}
 epTransicao = {}
 repeticao = 0
 
-def eliminarInal():                         # Percorre a tabela e remove quem não estiver na lista de alcançáveis
+
+def eliminar_incal():
     loop = {}
     loop.update(tabela)
     for regra in loop:
         if regra not in alcan:
-            del tabela[regra];
+            del tabela[regra]
                 
 
-def buscarAlcan(estado):                    # Percorre os estados da tabela recursivamente e se em suas transações ainda tiver um estado que não está em alcan
+def buscar_alcan(estado):
     if estado not in alcan:         
         alcan.append(estado)
         for tran in tabela[estado]:
             if str(tabela[estado][tran])[2:-2] != '' and str(tabela[estado][tran])[2:-2] != 'X':
-                buscarAlcan(str(tabela[estado][tran])[2:-2])
+                buscar_alcan(str(tabela[estado][tran])[2:-2])
 
 
-def eliminarEpTransicao():
+def eliminar_et():
     for regra in tabela:
-        if tabela[regra]['*'] != []:
+        if tabela[regra]['*']:
             if regra not in epTransicao:
                 epTransicao[regra] = tabela[regra]['*']
             else:
                 epTransicao[regra] += tabela[regra]['*']
 
-    for x in epTransicao:
-        for y in epTransicao:
-            if y in epTransicao[x]:
-                epTransicao[x] += epTransicao[y]
 
-    print("\n\nEp: ", epTransicao)
-    for conjunto in epTransicao:
-        for tran in tabela[conjunto]:
-            for epT in epTransicao[conjunto]:
-                tabela[conjunto][tran] += tabela[epT][tran]
-                if tran == '*':
-                    tabela[conjunto][tran] = [ ]
-    print("Tab2: ", tabela)
-
-
-def criaNovos(nstates):
+def criar_novos(nstates):
     for x in nstates:
         tabela[x] = {}
         estados.append(x)
@@ -58,108 +45,106 @@ def criaNovos(nstates):
             tabela[x][y] = []
         tabela[x]['*'] = []
 
-    for state in nstates:                                                        # Para os estados ainda não criados
+    for state in nstates:
         estadosjuntar = sorted(state.split(':'))
         for x in estadosjuntar:
-            if x == 'X':                                                         # X ainda não nos é útil
+            if x == 'X':
                 continue
             for simbolo in simbolos:
                 for transition in tabela[x][simbolo]:
                     if not tabela[state][simbolo].__contains__(transition):
                         tabela[state][simbolo].append(transition)
-    determizina()
+    determizinar()
 
 
-def determizina():
+def determizinar():
     novosestados = []
     for regra in tabela:
         for producao in tabela[regra]:
-            if len(tabela[regra][producao]) > 1:                                     # Caso tenho indeterminismo
-                novo = []                                                            # Estados individuais, que geram o indet
+            if len(tabela[regra][producao]) > 1:
+                novo = []
                 for estado in tabela[regra][producao]:
-                    if ':' in estado:                                                # Se tiver ':' será dividido e adicionado um à um
+                    if ':' in estado:
                         for aux in estado.split(':'):
                             if aux not in novo:
                                 novo.append(aux)
-                    else:                                                            # Se for na primeira vez, não tem ':', então o estado é adicionado à lista estados
-                        if not estado in novo:
+                    else:
+                        if estado not in novo:
                             novo.append(estado)
 
-                if novo:                                                             # se novo não for vazio
+                if novo:
                     novo = sorted(novo)
-                    novo = ':'.join(novo)                                            # Ex: ['A1', 'B1'] -> A1:B1
+                    novo = ':'.join(novo)
 
-                if novo and not novo in novosestados and not novo in list(tabela.keys()):
+                if novo and novo not in novosestados and novo not in list(tabela.keys()):
                     novosestados.append(novo)
                 tabela[regra][producao] = novo.split()
     if novosestados:
-        criaNovos(novosestados)
+        criar_novos(novosestados)
     
 
-def criarAF():
+def criar_af():
     for x in gramatica:
         tabela[x] = {}
         estados.append(x)
         for y in simbolos:
             tabela[x][y] = []
-        tabela[x]['*'] = []       # coluna do epsilon verificar
+        tabela[x]['*'] = []
 
     for regra in gramatica:
         for producao in gramatica[regra]:
-            if len(producao) == 1 and producao.islower():                                                             # somente 1 terminal
+            if len(producao) == 1 and producao.islower():
                 tabela[regra][producao].append('X')
-            elif producao[0] == '<':                                                                                   # somente 1 regra (epsilon transição)
+            elif producao[0] == '<':
                 tabela[regra]['*'].append(producao.split('<')[1][:-1])
-            elif producao != '*':                                                                                      # caso geral
+            elif producao != '*':
                 tabela[regra][producao[0]].append(producao.split('<')[1][:-1])
 
-    print('\nTabela: ', tabela)
 
-
-def criaSn(S):
+def criar_sn(s):
     global repeticao
-    if 'S' + str(repeticao) in gramatica:                                                                               # se já houver Sn na gramatica abortar
+    if 'S' + str(repeticao) in gramatica:
         return
-    gramatica['S' + str(repeticao)] = S.replace('\n','').split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')
+    gramatica['S' + str(repeticao)] = s.replace('\n', '').split(' ::= ')[1].replace('>', str(repeticao) + '>').split(' | ')
 
 
-def trataEstS(sentenca, op, proxregra):
+def tratar_estado_ini(sentenca, op, proxregra):
     global repeticao
     repeticao += 1
-    sentenca = sentenca.replace('\n','')
+    sentenca = sentenca.replace('\n', '')
     if 'S' in gramatica and op == 'G':
         gramatica['S'] += sentenca.split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')
     elif 'S' not in gramatica and op == 'G':
-        gramatica['S'] =  sentenca.split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')
+        gramatica['S'] = sentenca.split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')
     elif 'S' in gramatica and op == 'T':
         gramatica['S'] += str(sentenca + proxregra).split()
     elif 'S' not in gramatica and op == 'T':
         gramatica['S'] = str(sentenca + proxregra).split()
 
 
-def trataGram(gram , S):                                                                                                # Função usada para tratar gramáticas
+def tratar_gramatica(gram, s):
     for x in gram.split(' ::= ')[1].replace('\n', '').split(' | '):
         if x[0] not in simbolos and x[0].islower():
             simbolos.append(x[0])
-    regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')                                        # Adiciona o nome da regra à gramática
+    regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')
 
     if '<S> ::=' in gram:
-        trataEstS(gram, 'G', 'essa string nao eh usada')
+        tratar_estado_ini(gram, 'G', 'not used')
         if '<S>' in gram.replace('\n', '').split(' ::= ')[1]:
-            criaSn(S)
+            criar_sn(s)
     else:
         if '<S>' in gram.replace('\n', '').split(' ::= ')[1]:
-            criaSn(S)
-        gramatica[regra] = gram.replace('\n','').split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')         # Adiciona as transições à gramática
+            criar_sn(s)
+        gramatica[regra] = gram.replace('\n', '').split(' ::= ')[1].replace('>', str(repeticao)+'>').split(' | ')
 
 
-def trataToken(token):                                                                                                  # Função usada para tratar tokens
-    cop = token.replace('\n','')
+def tratar_token(token):
+    cop = token.replace('\n', '')
     token = list(token)
     if '\n' in token:
         token.remove('\n')
     for x in range(len(token)):
-        if token[x] not in simbolos and token[x].islower():                                                             # Se o símbolo ainda não existe, adiciona
+        if token[x] not in simbolos and token[x].islower():
             simbolos.append(token[x])
             
         if x == 0:
@@ -168,21 +153,20 @@ def trataToken(token):                                                          
             regra = cop.upper() + str(x)
 
         # é possível um token onde |token| = 1? se sim, falta tratar
-        if x == 0 and x != len(token)-1:                                                                                # Se for o primeiro e não último
-            trataEstS(token[x], 'T', '<' + regra + '>')
-        elif x == len(token)-1:                                                                                         # Se for o ultimo, é terminal e não leva à outro estado
+        if x == 0 and x != len(token)-1:
+            tratar_estado_ini(token[x], 'T', '<' + regra + '>')
+        elif x == len(token)-1:
             gramatica[regra] = str(token[x] + '<' + cop.upper() + '>').split()
             gramatica[cop.upper()] = []
         # pelo que me parece o caso abaixo não deve acontecer
-        elif regra in gramatica:                                                                                        # (??) Se a regra já existir será concatenada com simbolo+SIMBOLO+repeticao (??)
+        elif regra in gramatica:
             gramatica[regra] += str(token[x] + token[x].upper() + str(repeticao)).split()
-        else:                                                                                                           # se for um token entre o primeiro e o ultimo => token+proximaregra
+        else:
             gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>' ).split()
 
 
-def criarArquivo():
+def criar_csv():
     with open('afnd.csv', 'w', newline='') as f:
-        # fields = ['nomeregra'] + list(tabela['S'].keys())
         w = csv.writer(f)
         copydict = {}
         copydict.update(tabela)
@@ -192,7 +176,7 @@ def criarArquivo():
             w.writerow(copydict[x].values())
 
 
-def criarEstadoErro():
+def estado_erro():
     tabela['€'] = {}
     for y in simbolos:
         tabela['€'][y] = []
@@ -209,20 +193,16 @@ def main():
         if '<S> ::=' in x:
             estadoinicial = x
         if '::=' in x:
-            trataGram(x, estadoinicial)
+            tratar_gramatica(x, estadoinicial)
         else:
-            trataToken(x)
-    criarAF()
-    print("\n\nAFND: ", tabela)
-    eliminarEpTransicao()
-    determizina()
-    print("\n\nAFD: ", tabela)
-    buscarAlcan('S')
-    print('\n\nAlcan: ', alcan)
-    eliminarInal()
-    print("\n\nVIVOS: ", tabela)
-    criarEstadoErro()
-    criarArquivo()
+            tratar_token(x)
+    criar_af()
+    eliminar_et()
+    determizinar()
+    buscar_alcan('S')
+    eliminar_incal()
+    estado_erro()
+    criar_csv()
 
 
 main()
@@ -241,15 +221,15 @@ main()
 # <S> ::= a<A> | e<A> | i<A> | o<A> | u<A>
 # <A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
 
-#se
-#entao
-#senao
-#<S> ::= a<A> | e<A> | i<A> | o<A> | u<A> | <A>
-#<A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
+# se
+# entao
+# senao
+# <S> ::= a<A> | e<A> | i<A> | o<A> | u<A> | <A>
+# <A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
 
-#<S> ::= a<S> | <A>
-#<A> ::= b<A> | <B>
-#<B> ::= c<B> | *
+# <S> ::= a<S> | <A>
+# <A> ::= b<A> | <B>
+# <B> ::= c<B> | *
 
 # if
 # <S> ::= a<A> | b<B> | b | c<S> | c | *
