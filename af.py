@@ -123,58 +123,43 @@ def criar_sn(s):
     gramatica['S' + str(repeticao)] = s.replace('\n', '').split(' ::= ')[1].replace('>', str(repeticao) + '>').split(' | ')
 
 
-def tratar_estado_ini(sentenca, op, proxregra):
-    global repeticao
-    repeticao += 1
-    sentenca = sentenca.replace('\n', '')
-    if 'S' in gramatica and op == 'G':
-        gramatica['S'] += sentenca.split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')
-    elif 'S' not in gramatica and op == 'G':
-        gramatica['S'] = sentenca.split(' ::= ')[1].replace('>',str(repeticao)+'>').split(' | ')
-    elif 'S' in gramatica and op == 'T':
-        gramatica['S'] += str(sentenca + proxregra).split()
-    elif 'S' not in gramatica and op == 'T':
-        gramatica['S'] = str(sentenca + proxregra).split()
-
-
 def tratar_gramatica(gram, s):
-    for x in gram.split(' ::= ')[1].replace('\n', '').split(' | '):
-        if x[0] not in simbolos and x[0].islower():
+    global repeticao
+    gram = gram.replace('\n', '')
+    for x in gram.split(' ::= ')[1].split(' | '):
+        if x[0].islower() and x[0] not in simbolos:
             simbolos.append(x[0])
     regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')
 
-    if '<S> ::=' in gram:
-        tratar_estado_ini(gram, 'G', 'not used')
-        if '<S>' in gram.replace('\n', '').split(' ::= ')[1]:
-            criar_sn(s)
+    if regra[0] == 'S':
+        repeticao += 1
+        gramatica['S'] += gram.split(' ::= ')[1].replace('>', str(repeticao) + '>').split(' | ')
     else:
-        if '<S>' in gram.replace('\n', '').split(' ::= ')[1]:
-            criar_sn(s)
-        gramatica[regra] = gram.replace('\n', '').split(' ::= ')[1].replace('>', str(repeticao)+'>').split(' | ')
+        gramatica[regra] = gram.split(' ::= ')[1].replace('>', str(repeticao)+'>').split(' | ')
+
+    if '<S>' in gram.split(' ::= ')[1]:
+        criar_sn(s)
 
 
 def tratar_token(token):
-    cop = token.replace('\n', '')
+    token = token.replace('\n', '')
+    cp_token = token
     token = list(token)
-    if '\n' in token:
-        token.remove('\n')
     for x in range(len(token)):
-        if token[x] not in simbolos and token[x].islower():
+        if token[x].islower() and token[x] not in simbolos:
             simbolos.append(token[x])
-            
-        if x == 0:
-            regra = cop.upper() + '1'
-        else:
-            regra = cop.upper() + str(x)
 
         if x == 0 and x != len(token)-1:
-            tratar_estado_ini(token[x], 'T', '<' + regra + '>')
+            iniregra = '<' + cp_token.upper() + '1>'
+            gramatica['S'] += str(token[x] + iniregra).split()
         elif x == len(token)-1:
-            gramatica[regra] = str(token[x] + '<' + cop.upper() + '>').split()
-            gramatica[cop.upper()] = []
-            finais.append(cop.upper())
+            finregra = '<' + cp_token.upper() + '>'
+            gramatica[cp_token.upper() + str(x)] = str(token[x] + finregra).split()
+            gramatica[cp_token.upper()] = []
+            finais.append(cp_token.upper())
         else:
-            gramatica[regra] = str(token[x] + '<' + cop.upper() + str(x+1) + '>').split()
+            proxregra = '<' + cp_token.upper() + str(x+1) + '>'
+            gramatica[cp_token.upper() + str(x)] = str(token[x] + proxregra).split()
 
 
 def criar_csv():
@@ -205,6 +190,7 @@ def estado_erro():
 
 
 def main():
+    gramatica['S'] = []
     estadoinicial = ''
     for x in arquivo:
         if '<S> ::=' in x:
