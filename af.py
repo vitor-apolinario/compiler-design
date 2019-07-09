@@ -23,9 +23,10 @@ def eliminar_incal():
 def buscar_alcan(estado):
     if estado not in alcan:         
         alcan.append(estado)
-        for tran in tabela[estado]:
-            if str(tabela[estado][tran])[2:-2] != '' and str(tabela[estado][tran])[2:-2] != 'X':
-                buscar_alcan(str(tabela[estado][tran])[2:-2])
+        for simbolo in tabela[estado]:
+            if tabela[estado][simbolo] \
+                    and tabela[estado][simbolo][0] not in alcan:
+                buscar_alcan(tabela[estado][simbolo][0])
 
 
 def encontrar_eps_set(e_transicoes):
@@ -62,8 +63,6 @@ def criar_novos(nstates):
         for x in estadosjuntar:
             if x in finais and state not in finais:
                 finais.append(state)
-            if x == 'X':
-                continue
             for simbolo in simbolos:
                 for transition in tabela[x][simbolo]:
                     if not tabela[state][simbolo].__contains__(transition):
@@ -107,14 +106,14 @@ def criar_af():
 
     for regra in gramatica:
         for producao in gramatica[regra]:
-            if len(producao) == 1 and producao.islower():
-                tabela[regra][producao].append('X')
+            if len(producao) == 1 and producao.islower() and regra not in finais:
+                finais.append(regra)
+            elif producao == '*' and regra not in finais:
+                finais.append(regra)
             elif producao[0] == '<':
                 tabela[regra]['*'].append(producao.split('<')[1][:-1])
             elif producao != '*':
                 tabela[regra][producao[0]].append(producao.split('<')[1][:-1])
-            elif producao == '*' and regra not in finais:
-                finais.append(regra)
 
 
 def criar_sn(s):
@@ -168,14 +167,14 @@ def tratar_token(token):
         else:
             regra = cop.upper() + str(x)
 
-        # é possível um token onde |token| = 1? se sim, falta tratar
         if x == 0 and x != len(token)-1:
             tratar_estado_ini(token[x], 'T', '<' + regra + '>')
         elif x == len(token)-1:
             gramatica[regra] = str(token[x] + '<' + cop.upper() + '>').split()
             gramatica[cop.upper()] = []
+            finais.append(cop.upper())
         else:
-            gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>').split()
+            gramatica[regra] = str(token[x] + '<' + cop.upper() + str(x+1) + '>').split()
 
 
 def criar_csv():
