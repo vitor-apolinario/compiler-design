@@ -5,9 +5,9 @@ simbolos = []
 estados = []
 alcan = []
 mortos = []
-novos = []
 gramatica = {}
 tabela = {}
+finais = []
 epTransicao = {}
 repeticao = 0
 
@@ -28,13 +28,25 @@ def buscar_alcan(estado):
                 buscar_alcan(str(tabela[estado][tran])[2:-2])
 
 
+def encontrar_eps_set(e_transicoes):
+    for x in e_transicoes:
+        for y in tabela[x]['*']:
+            if y not in e_transicoes:
+                e_transicoes.append(y)
+    return e_transicoes
+
+
 def eliminar_et():
     for regra in tabela:
-        if tabela[regra]['*']:
-            if regra not in epTransicao:
-                epTransicao[regra] = tabela[regra]['*']
-            else:
-                epTransicao[regra] += tabela[regra]['*']
+        et_set = encontrar_eps_set(tabela[regra]['*'])
+        for estado in et_set:
+            if estado in finais:
+                finais.append(regra)
+            for simbolo in tabela[estado]:
+                for transicao in tabela[estado][simbolo]:
+                    if transicao not in tabela[regra][simbolo]:
+                        tabela[regra][simbolo].append(transicao)
+        tabela[regra]['*'] = []
 
 
 def criar_novos(nstates):
@@ -48,6 +60,8 @@ def criar_novos(nstates):
     for state in nstates:
         estadosjuntar = sorted(state.split(':'))
         for x in estadosjuntar:
+            if x in finais and state not in finais:
+                finais.append(state)
             if x == 'X':
                 continue
             for simbolo in simbolos:
@@ -99,6 +113,8 @@ def criar_af():
                 tabela[regra]['*'].append(producao.split('<')[1][:-1])
             elif producao != '*':
                 tabela[regra][producao[0]].append(producao.split('<')[1][:-1])
+            elif producao == '*' and regra not in finais:
+                finais.append(regra)
 
 
 def criar_sn(s):
@@ -158,11 +174,8 @@ def tratar_token(token):
         elif x == len(token)-1:
             gramatica[regra] = str(token[x] + '<' + cop.upper() + '>').split()
             gramatica[cop.upper()] = []
-        # pelo que me parece o caso abaixo não deve acontecer
-        elif regra in gramatica:
-            gramatica[regra] += str(token[x] + token[x].upper() + str(repeticao)).split()
         else:
-            gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>' ).split()
+            gramatica[regra] = str(token[x]+ '<' + cop.upper() + str(x+1) + '>').split()
 
 
 def criar_csv():
@@ -172,7 +185,10 @@ def criar_csv():
         copydict.update(tabela)
         w.writerow(list(copydict['S'].keys()) + ['regra'])
         for x in copydict:
-            copydict[x]['nomeregra'] = x
+            if x in finais:
+                copydict[x]['nomeregra'] = x + '*'
+            else:
+                copydict[x]['nomeregra'] = x
             w.writerow(copydict[x].values())
 
 
@@ -183,8 +199,10 @@ def estado_erro():
     tabela['€']['*'] = []
     for regra in tabela:
         for simbolo in tabela[regra]:
-            if not tabela[regra][simbolo]:
+            if not tabela[regra][simbolo] and (regra[-1].isnumeric() or regra in ['S', '€']):
                 tabela[regra][simbolo] = ['€']
+            elif not (regra[-1].isnumeric() or regra in ['S', '€']):
+                tabela[regra][simbolo] = ['-']
 
 
 def main():
@@ -237,3 +255,11 @@ main()
 # <B> ::= a<A> | c<B> | c<S> | c
 # <C> ::= a<S> | a | c<A> | c<C>
 # else
+
+# <S> ::= a<A> | a | b | c<C> | b<D>
+# <A> ::= a<B> | b<A> | c<B> | *
+# <B> ::= a<A> | b<B> | c<A> | a | c
+# <C> ::= a<C> | b<D> | c<C> | b
+# <D> ::= a<D> | b<C> | c<C> | * | c | a
+# <E> ::= a<C> | b<F> | a
+# <F> ::= b<E> | c<B> | b
