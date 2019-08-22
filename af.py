@@ -4,12 +4,35 @@ arquivo = list(open('tokens.txt'))
 simbolos = []
 estados = []
 alcan = []
-mortos = []
 gramatica = {}
 tabela = {}
 finais = []
+vivos = []
 epTransicao = {}
 repeticao = 0
+
+
+def eliminar_mortos():
+    mortos = []
+    for x in tabela:
+        if x not in vivos and x != '€':
+            mortos.append(x)
+    
+    for x in mortos:
+        del tabela[x]
+
+
+def buscar_vivos():    
+    mudou = False
+
+    for regra in tabela:
+        for simbolo in tabela[regra]:
+            if tabela[regra][simbolo][0] in vivos and regra not in vivos:
+                vivos.append(regra)
+                mudou = True
+
+    if mudou:
+        buscar_vivos()
 
 
 def eliminar_incal():
@@ -204,7 +227,11 @@ def main():
     determizinar()
     buscar_alcan('S')
     eliminar_incal()
+    # não pode buscar_vivos() antes de estado_erro()
     estado_erro()
+    vivos.extend(finais)
+    buscar_vivos()
+    eliminar_mortos()    
     criar_csv()
 
 
