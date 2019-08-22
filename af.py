@@ -1,5 +1,6 @@
 import csv
 arquivo = list(open('tokens.txt'))
+codigo  = list(open('codigo.txt'))
 
 simbolos = []
 estados = []
@@ -233,6 +234,32 @@ def main():
     buscar_vivos()
     eliminar_mortos()    
     criar_csv()
+
+    tS = {}
+    separadores = [' ', '\n', '\t']
+    operadores  = ['+', '-']
+
+    for idx, linha in enumerate(codigo):
+        E = 'S'
+        string = ''
+        tS[idx] = [] 
+
+        for char in linha:
+            if char in separadores and string:
+                tS[idx].append(E + ':' + string)
+                E = 'S'
+                string = ''
+                continue
+
+            string += char
+            if char not in simbolos:
+                E = '€'
+            else:
+                E = tabela[E][char][0]
+
+    print(tS)
+
+
 
 
 main()
