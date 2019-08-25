@@ -236,28 +236,35 @@ def main():
     criar_csv()
 
     tS = {}
+    fitaSaida = []
     separadores = [' ', '\n', '\t']
     operadores  = ['+', '-']
-
+    print('Finais: ', finais)
     for idx, linha in enumerate(codigo):
         E = 'S'
         string = ''
         tS[idx] = [] 
-
         for char in linha:
             if char in separadores and string:
-                tS[idx].append(E + ':' + string)
+                if E in finais:
+                    tS[idx].append(E + ':' + string)
+                    fitaSaida.append(E)
+                else:
+                    tS[idx].append('€' + ':' + string)
+                    fitaSaida.append('€')
                 E = 'S'
                 string = ''
-                continue
-
             string += char
             if char not in simbolos:
                 E = '€'
             else:
                 E = tabela[E][char][0]
+            if string == ' ':
+                string = ''
+                E = 'S'
 
-    print(tS)
+    print('Tabela Simbolos: ', tS)
+    print('Fita Saída: ', fitaSaida)
 
 
 
