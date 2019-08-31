@@ -151,7 +151,7 @@ def tratar_gramatica(gram, s):
     global repeticao
     gram = gram.replace('\n', '')
     for x in gram.split(' ::= ')[1].split(' | '):
-        if x[0].islower() and x[0] not in simbolos:
+        if x[0] not in simbolos and not x[0].isupper():
             simbolos.append(x[0])
     regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')
 
@@ -170,7 +170,7 @@ def tratar_token(token):
     cp_token = token
     token = list(token)
     for x in range(len(token)):
-        if token[x].islower() and token[x] not in simbolos:
+        if token[x] not in simbolos and not token[x].isupper():
             simbolos.append(token[x])
 
         if x == 0 and x != len(token)-1:
@@ -238,7 +238,7 @@ def main():
     tS = {}
     fitaSaida = []
     separadores = [' ', '\n', '\t']
-    operadores  = ['+', '-']
+    operadores  = ['+',  '-']
     print('Finais: ', finais)
     for idx, linha in enumerate(codigo):
         E = 'S'
@@ -268,7 +268,7 @@ def main():
 
 
 
-
+print('\n'  * 25)
 main()
 
 
