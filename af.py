@@ -173,7 +173,12 @@ def tratar_token(token):
         if token[x] not in simbolos and not token[x].isupper():
             simbolos.append(token[x])
 
-        if x == 0 and x != len(token)-1:
+        if x == 0 and x == len(token)-1:
+            iniregra = '<' + cp_token.upper() + '>'
+            gramatica['S'] += str(token[x] + iniregra).split()            
+            gramatica[cp_token.upper()] = []
+            finais.append(cp_token.upper())
+        elif x == 0 and x != len(token)-1:
             iniregra = '<' + cp_token.upper() + '1>'
             gramatica['S'] += str(token[x] + iniregra).split()
         elif x == len(token)-1:
@@ -184,7 +189,6 @@ def tratar_token(token):
         else:
             proxregra = '<' + cp_token.upper() + str(x+1) + '>'
             gramatica[cp_token.upper() + str(x)] = str(token[x] + proxregra).split()
-
 
 def criar_csv():
     with open('afnd.csv', 'w', newline='') as f:
@@ -232,9 +236,9 @@ def main():
     estado_erro()
     vivos.extend(finais)
     buscar_vivos()
-    eliminar_mortos()    
-    criar_csv()
+    eliminar_mortos()
 
+    criar_csv()
     tS = {}
     fitaSaida = []
     separadores = [' ', '\n', '\t']
@@ -268,7 +272,7 @@ def main():
 
 
 
-print('\n'  * 25)
+print('\n'  * 45)
 main()
 
 

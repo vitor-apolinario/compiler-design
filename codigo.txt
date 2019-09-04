@@ -1,4 +1,2 @@
-babalu    
-    geg eizi
-if a 
-el
+if
+a + ab 
