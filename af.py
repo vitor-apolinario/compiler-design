@@ -150,7 +150,7 @@ def criar_sn(s):
 def tratar_gramatica(gram, s):
     global repeticao
     gram = gram.replace('\n', '')
-    for x in gram.split(' ::= ')[1].split(' | '):
+    for x in gram.split(' ::= ')[1].replace('<', '').replace('>', '').split(' | '):
         if x[0] not in simbolos and not x[0].isupper():
             simbolos.append(x[0])
     regra = gram.split(' ::= ')[0].replace('>', str(repeticao)).replace('<', '')
@@ -173,7 +173,7 @@ def tratar_token(token):
         if token[x] not in simbolos and not token[x].isupper():
             simbolos.append(token[x])
 
-        if x == 0 and x == len(token)-1:
+        if len(token) == 1:
             iniregra = '<' + cp_token.upper() + '>'
             gramatica['S'] += str(token[x] + iniregra).split()            
             gramatica[cp_token.upper()] = []
@@ -189,6 +189,7 @@ def tratar_token(token):
         else:
             proxregra = '<' + cp_token.upper() + str(x+1) + '>'
             gramatica[cp_token.upper() + str(x)] = str(token[x] + proxregra).split()
+
 
 def criar_csv():
     with open('afnd.csv', 'w', newline='') as f:
@@ -211,10 +212,8 @@ def estado_erro():
     tabela['€']['*'] = []
     for regra in tabela:
         for simbolo in tabela[regra]:
-            if not tabela[regra][simbolo] and (regra[-1].isnumeric() or regra in ['S', '€']):
+            if not tabela[regra][simbolo]:
                 tabela[regra][simbolo] = ['€']
-            elif not (regra[-1].isnumeric() or regra in ['S', '€']):
-                tabela[regra][simbolo] = ['-']
 
 
 def main():
@@ -232,7 +231,9 @@ def main():
     determizinar()
     buscar_alcan('S')
     eliminar_incal()
-    # não pode buscar_vivos() antes de estado_erro()
+    # buscar_vivos() acessa tabela[regra][simbolo][0]
+    # portanto tabela[regra][simbolo] não pode ser vazio
+    # logo, chamar estado_erro() antes de buscar_vivos()
     estado_erro()
     vivos.extend(finais)
     buscar_vivos()
@@ -258,21 +259,18 @@ def main():
                     fitaSaida.append('€')
                 E = 'S'
                 string = ''
-            string += char
-            if char not in simbolos:
-                E = '€'
             else:
-                E = tabela[E][char][0]
-            if string == ' ':
-                string = ''
-                E = 'S'
+                string += char
+                if char not in simbolos:
+                    E = '€'
+                else:
+                    E = tabela[E][char][0]
 
     print('Tabela Simbolos: ', tS)
     print('Fita Saída: ', fitaSaida)
 
 
-
-print('\n'  * 45)
+print('\n' * 45)
 main()
 
 
