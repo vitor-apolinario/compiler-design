@@ -275,6 +275,8 @@ def main():
                     else:
                         E = tabela[E][char][0]
             else:
+                if char in separadores:
+                    continue
                 if char not in separadores and char not in operadores and string:
                     if string[-1] in operadores:
                         if E in finais:                                             # O operador lido atualmente é um separador
@@ -290,10 +292,11 @@ def main():
                     E = '€'
                 else:
                     E = tabela[E][char][0]
-
-    print('Tabela Simbolos: ', tS)
-    print('Fita Saída: ', fitaSaida)
-
+    fitaSaida.append('$')
+    for linha in tS:
+        for token in tS[linha]:
+            if token and token[0] == '€':
+                print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
 
 print('\n' * 45)
 main()
