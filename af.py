@@ -259,6 +259,22 @@ def main():
                     fitaSaida.append('€')
                 E = 'S'
                 string = ''
+            elif char in operadores and string:                             # Se lemos um operador e temos uma string não vazia
+                if string[-1] not in operadores:                            # Se o ultimo caractere reconhecido não é um operador:
+                    if E in finais:                                             # O operador lido atualmente é um separador
+                        tS[idx].append(E + ':' + string)                        # Logo devemos reconhecer a string anterior e continuar a leitura
+                        fitaSaida.append(E)
+                    else:
+                        tS[idx].append('€' + ':' + string)
+                        fitaSaida.append('€')
+                    E = tabela['S'][char][0]                               # É iniciado o mapeamento da próxima estrutura de operadores
+                    string = char
+                else:                                                      # Caso o último caractere reconhecido seja um operador
+                    string += char                                           # continuamos o mapeamento normalmente
+                    if char not in simbolos:
+                        E = '€'
+                    else:
+                        E = tabela[E][char][0]
             else:
                 string += char
                 if char not in simbolos:
