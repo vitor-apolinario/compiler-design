@@ -243,8 +243,7 @@ def main():
     tS = {}
     fitaSaida = []
     separadores = [' ', '\n', '\t']
-    operadores  = ['+',  '-']
-    print('Finais: ', finais)
+    operadores  = ['+',  '-', '=']
     for idx, linha in enumerate(codigo):
         E = 'S'
         string = ''
@@ -276,6 +275,16 @@ def main():
                     else:
                         E = tabela[E][char][0]
             else:
+                if char not in separadores and char not in operadores and string:
+                    if string[-1] in operadores:
+                        if E in finais:                                             # O operador lido atualmente é um separador
+                            tS[idx].append(E + ':' + string)                        # Logo devemos reconhecer a string anterior e continuar a leitura
+                            fitaSaida.append(E)
+                        else:
+                            tS[idx].append('€' + ':' + string)
+                            fitaSaida.append('€')
+                        E = 'S'
+                        string = ''
                 string += char
                 if char not in simbolos:
                     E = '€'

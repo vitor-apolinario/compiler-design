@@ -1,2 +1,3 @@
-if
-a + ab 
+if a>=b
+a+ab=3 
+vitao +vitao= 2 vitao
