@@ -1,9 +1,15 @@
-if
-<S> ::= a<S> | a<A>
-<A> ::= b<A> | <B>
-<B> ::= c<B> | *
-else
+<S> ::= a<S> | e<S> | i<S> | o<S> | u<S> | <A>
+<A> ::= *
+<S> ::= 0<S> | 1<S> | <A>
+<A> ::= *
+bin
+se
+para
+igual
+menor
+maior
+~
 +
-=
->=
-vitao
+-
+;
+#

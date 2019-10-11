@@ -1,0 +1,6 @@
+<S> ::= <DEC><S> | <REP><S> | <CON><S> | *
+<DEC> ::= bin<VAR><ATR>
+<ATR> ::= ;<S> | ~<NUM>;<S>
+<CON> ::= se<BI>#<S>#<S>
+<BI> ::= <VAR> | <VAR><OP><VAR> | <VAR><OP><NUM> | <NUM><OP><VAR> | <NUM><OP><NUM>
+<REP> ::= para<BI>#<S>#<S>

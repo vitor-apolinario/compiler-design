@@ -242,8 +242,8 @@ def main():
     criar_csv()
     tS = {}
     fitaSaida = []
-    separadores = [' ', '\n', '\t']
-    operadores  = ['+',  '-', '=']
+    separadores = [' ', '\n', '\t', '+', '-', '#', '~', ';']
+    operadores  = ['+', '-', '#', '~', ';']
     for idx, linha in enumerate(codigo):
         E = 'S'
         string = ''
