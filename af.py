@@ -219,31 +219,7 @@ def estado_erro():
             if not tabela[regra][simbolo]:
                 tabela[regra][simbolo] = ['€']
 
-
-def main():
-    gramatica['S'] = []
-    estadoinicial = ''
-    for x in arquivo:
-        if '<S> ::=' in x:
-            estadoinicial = x
-        if '::=' in x:
-            tratar_gramatica(x, estadoinicial)
-        else:
-            tratar_token(x)
-    criar_af()
-    eliminar_et()
-    determizinar()
-    buscar_alcan('S')
-    eliminar_incal()
-    # buscar_vivos() acessa tabela[regra][simbolo][0]
-    # portanto tabela[regra][simbolo] não pode ser vazio
-    # logo, chamar estado_erro() antes de buscar_vivos()
-    estado_erro()
-    vivos.extend(finais)
-    buscar_vivos()
-    eliminar_mortos()
-
-    criar_csv()
+def analisadorLexico():
     tS = {}
     fitaSaida = []
     separadores = [' ', '\n', '\t', '+', '-', '#', '~', ';']
@@ -302,6 +278,7 @@ def main():
             if token and token[0] == '€':
                 print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
 
+def analisadorSintatico():
     alfabeto = {}
     LALRTable = {}
 
@@ -317,8 +294,32 @@ def main():
             for action in state:
                 LALRTable[state.attrib['Index']][action.attrib['SymbolIndex']] = action.attrib['Action'], action.attrib['Value']
 
-    print('Alfabeto: ', alfabeto)
+    print('\nAlfabeto: ', alfabeto)
     print('\nLALR: ', LALRTable)
+
+def main():
+    gramatica['S'] = []
+    estadoinicial = ''
+    for x in arquivo:
+        if '<S> ::=' in x:
+            estadoinicial = x
+        if '::=' in x:
+            tratar_gramatica(x, estadoinicial)
+        else:
+            tratar_token(x)
+    criar_af()
+    eliminar_et()
+    determizinar()
+    buscar_alcan('S')
+    eliminar_incal()
+    estado_erro()
+    vivos.extend(finais)
+    buscar_vivos()
+    eliminar_mortos()
+    criar_csv()
+    analisadorLexico()
+    analisadorSintatico()
+
 
 print('\n' * 45)
 main()
