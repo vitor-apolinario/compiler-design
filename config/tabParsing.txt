@@ -1,0 +1,1316 @@
+﻿============================================================
+GOLD Parser Builder
+Version 5.2.0.
+============================================================
+
+
+========================================
+Terminals
+========================================
+
+ 0      (EOF)
+ 1      (Error)
+ 2      Whitespace
+ 3      '#'
+ 4      '*'
+ 5      ';'
+ 6      '~'
+ 7      '0'
+ 8      '1'
+ 9      a
+ 10     bin
+ 11     e
+ 12     i
+ 13     igual
+ 14     maior
+ 15     menor
+ 16     o
+ 17     para
+ 18     se
+ 19     u
+
+
+========================================
+Nonterminals
+========================================
+
+20      <ATR>
+21      <COMP>
+22      <COND>
+23      <DATR>
+24      <DEC>
+25      <F>
+26      <NUM>
+27      <OP>
+28      <REP>
+29      <S>
+30      <VAR>
+
+
+========================================
+Rules
+========================================
+
+0       <S> ::= <DEC> <S>
+1       <S> ::= <ATR> <S>
+2       <S> ::= <REP> <S>
+3       <S> ::= <COND> <S>
+4       <S> ::= '*'
+5       <DEC> ::= bin <VAR> <DATR>
+6       <ATR> ::= <VAR> '~' <NUM>
+7       <DATR> ::= ';' <S>
+8       <DATR> ::= '~' <NUM> ';' <S>
+9       <COND> ::= se <COMP> '#' <S> '#' <S>
+10      <REP> ::= para <COMP> '#' <S> '#' <S>
+11      <COMP> ::= <VAR>
+12      <COMP> ::= <VAR> <OP> <VAR>
+13      <COMP> ::= <VAR> <OP> <NUM>
+14      <COMP> ::= <NUM> <OP> <VAR>
+15      <COMP> ::= <NUM> <OP> <NUM>
+16      <OP> ::= igual
+17      <OP> ::= maior
+18      <OP> ::= menor
+19      <NUM> ::= '0' <NUM> <F>
+20      <NUM> ::= '1' <NUM> <F>
+21      <VAR> ::= a <VAR> <F>
+22      <VAR> ::= e <VAR> <F>
+23      <VAR> ::= i <VAR> <F>
+24      <VAR> ::= o <VAR> <F>
+25      <VAR> ::= u <VAR> <F>
+26      <F> ::= '*'
+
+
+========================================
+LALR States
+========================================
+
+State 0
+        <S'> ::= _ <S> (EOF)                           <S'> ::= ^ <S> (EOF)
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 14
+        <VAR> g 15
+
+
+State 1
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <S> ::= '*' _                                  <S> ::= '*' ^
+
+        (EOF) r 4
+        '#' r 4
+        '*' r 4
+        a r 4
+        bin r 4
+        e r 4
+        i r 4
+        o r 4
+        para r 4
+        se r 4
+        u r 4
+
+
+State 2
+        Prior States: 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 35, 43, 47, 48, 49, 62, 63, 64
+
+        <VAR> ::= a _ <VAR> <F>                        <VAR> ::= a ^ <VAR> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <VAR> g 16
+
+
+State 3
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <DEC> ::= bin _ <VAR> <DATR>                   <DEC> ::= bin ^ <VAR> <DATR>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <VAR> g 17
+
+
+State 4
+        Prior States: 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 35, 43, 47, 48, 49, 62, 63, 64
+
+        <VAR> ::= e _ <VAR> <F>                        <VAR> ::= e ^ <VAR> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <VAR> g 18
+
+
+State 5
+        Prior States: 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 35, 43, 47, 48, 49, 62, 63, 64
+
+        <VAR> ::= i _ <VAR> <F>                        <VAR> ::= i ^ <VAR> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <VAR> g 19
+
+
+State 6
+        Prior States: 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 35, 43, 47, 48, 49, 62, 63, 64
+
+        <VAR> ::= o _ <VAR> <F>                        <VAR> ::= o ^ <VAR> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <VAR> g 20
+
+
+State 7
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <REP> ::= para _ <COMP> '#' <S> '#' <S>        <REP> ::= para ^ <COMP> '#' <S> '#' <S>
+        <COMP> ::= _ <VAR>                             <COMP> ::= ^ <VAR>
+        <COMP> ::= _ <VAR> <OP> <VAR>                  <COMP> ::= ^ <VAR> <OP> <VAR>
+        <COMP> ::= _ <VAR> <OP> <NUM>                  <COMP> ::= ^ <VAR> <OP> <NUM>
+        <COMP> ::= _ <NUM> <OP> <VAR>                  <COMP> ::= ^ <NUM> <OP> <VAR>
+        <COMP> ::= _ <NUM> <OP> <NUM>                  <COMP> ::= ^ <NUM> <OP> <NUM>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '0' s 21
+        '1' s 22
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <COMP> g 23
+        <NUM> g 24
+        <VAR> g 25
+
+
+State 8
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <COND> ::= se _ <COMP> '#' <S> '#' <S>         <COND> ::= se ^ <COMP> '#' <S> '#' <S>
+        <COMP> ::= _ <VAR>                             <COMP> ::= ^ <VAR>
+        <COMP> ::= _ <VAR> <OP> <VAR>                  <COMP> ::= ^ <VAR> <OP> <VAR>
+        <COMP> ::= _ <VAR> <OP> <NUM>                  <COMP> ::= ^ <VAR> <OP> <NUM>
+        <COMP> ::= _ <NUM> <OP> <VAR>                  <COMP> ::= ^ <NUM> <OP> <VAR>
+        <COMP> ::= _ <NUM> <OP> <NUM>                  <COMP> ::= ^ <NUM> <OP> <NUM>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '0' s 21
+        '1' s 22
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <COMP> g 26
+        <NUM> g 24
+        <VAR> g 25
+
+
+State 9
+        Prior States: 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 35, 43, 47, 48, 49, 62, 63, 64
+
+        <VAR> ::= u _ <VAR> <F>                        <VAR> ::= u ^ <VAR> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <VAR> g 27
+
+
+State 10
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <S> ::= <ATR> _ <S>                            <S> ::= <ATR> ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 28
+        <VAR> g 15
+
+
+State 11
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <S> ::= <COND> _ <S>                           <S> ::= <COND> ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 29
+        <VAR> g 15
+
+
+State 12
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <S> ::= <DEC> _ <S>                            <S> ::= <DEC> ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 30
+        <VAR> g 15
+
+
+State 13
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <S> ::= <REP> _ <S>                            <S> ::= <REP> ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 31
+        <VAR> g 15
+
+
+State 14
+        Prior States: 0
+
+        <S'> ::= <S> _ (EOF)                           <S'> ::= <S> ^ (EOF)
+
+        (EOF) a
+
+
+State 15
+        Prior States: 0, 10, 11, 12, 13, 35, 43, 49, 62, 63, 64
+
+        <ATR> ::= <VAR> _ '~' <NUM>                    <ATR> ::= <VAR> ^ '~' <NUM>
+
+        '~' s 32
+
+
+State 16
+        Prior States: 2
+
+        <VAR> ::= a <VAR> _ <F>                        <VAR> ::= a <VAR> ^ <F>
+        <F> ::= _ '*'                                  <F> ::= ^ '*'
+
+        '*' s 33
+        <F> g 34
+
+
+State 17
+        Prior States: 3
+
+        <DEC> ::= bin <VAR> _ <DATR>                   <DEC> ::= bin <VAR> ^ <DATR>
+        <DATR> ::= _ ';' <S>                           <DATR> ::= ^ ';' <S>
+        <DATR> ::= _ '~' <NUM> ';' <S>                 <DATR> ::= ^ '~' <NUM> ';' <S>
+
+        ';' s 35
+        '~' s 36
+        <DATR> g 37
+
+
+State 18
+        Prior States: 4
+
+        <VAR> ::= e <VAR> _ <F>                        <VAR> ::= e <VAR> ^ <F>
+        <F> ::= _ '*'                                  <F> ::= ^ '*'
+
+        '*' s 33
+        <F> g 38
+
+
+State 19
+        Prior States: 5
+
+        <VAR> ::= i <VAR> _ <F>                        <VAR> ::= i <VAR> ^ <F>
+        <F> ::= _ '*'                                  <F> ::= ^ '*'
+
+        '*' s 33
+        <F> g 39
+
+
+State 20
+        Prior States: 6
+
+        <VAR> ::= o <VAR> _ <F>                        <VAR> ::= o <VAR> ^ <F>
+        <F> ::= _ '*'                                  <F> ::= ^ '*'
+
+        '*' s 33
+        <F> g 40
+
+
+State 21
+        Prior States: 7, 8, 21, 22, 32, 36, 47, 48
+
+        <NUM> ::= '0' _ <NUM> <F>                      <NUM> ::= '0' ^ <NUM> <F>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+
+        '0' s 21
+        '1' s 22
+        <NUM> g 41
+
+
+State 22
+        Prior States: 7, 8, 21, 22, 32, 36, 47, 48
+
+        <NUM> ::= '1' _ <NUM> <F>                      <NUM> ::= '1' ^ <NUM> <F>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+
+        '0' s 21
+        '1' s 22
+        <NUM> g 42
+
+
+State 23
+        Prior States: 7
+
+        <REP> ::= para <COMP> _ '#' <S> '#' <S>        <REP> ::= para <COMP> ^ '#' <S> '#' <S>
+
+        '#' s 43
+
+
+State 24
+        Prior States: 7, 8
+
+        <COMP> ::= <NUM> _ <OP> <VAR>                  <COMP> ::= <NUM> ^ <OP> <VAR>
+        <COMP> ::= <NUM> _ <OP> <NUM>                  <COMP> ::= <NUM> ^ <OP> <NUM>
+        <OP> ::= _ igual                               <OP> ::= ^ igual
+        <OP> ::= _ maior                               <OP> ::= ^ maior
+        <OP> ::= _ menor                               <OP> ::= ^ menor
+
+        igual s 44
+        maior s 45
+        menor s 46
+        <OP> g 47
+
+
+State 25
+        Prior States: 7, 8
+
+        <COMP> ::= <VAR> _                             <COMP> ::= <VAR> ^
+        <COMP> ::= <VAR> _ <OP> <VAR>                  <COMP> ::= <VAR> ^ <OP> <VAR>
+        <COMP> ::= <VAR> _ <OP> <NUM>                  <COMP> ::= <VAR> ^ <OP> <NUM>
+        <OP> ::= _ igual                               <OP> ::= ^ igual
+        <OP> ::= _ maior                               <OP> ::= ^ maior
+        <OP> ::= _ menor                               <OP> ::= ^ menor
+
+        igual s 44
+        maior s 45
+        menor s 46
+        <OP> g 48
+        '#' r 11
+
+
+State 26
+        Prior States: 8
+
+        <COND> ::= se <COMP> _ '#' <S> '#' <S>         <COND> ::= se <COMP> ^ '#' <S> '#' <S>
+
+        '#' s 49
+
+
+State 27
+        Prior States: 9
+
+        <VAR> ::= u <VAR> _ <F>                        <VAR> ::= u <VAR> ^ <F>
+        <F> ::= _ '*'                                  <F> ::= ^ '*'
+
+        '*' s 33
+        <F> g 50
+
+
+State 28
+        Prior States: 10
+
+        <S> ::= <ATR> <S> _                            <S> ::= <ATR> <S> ^
+
+        (EOF) r 1
+        '#' r 1
+        '*' r 1
+        a r 1
+        bin r 1
+        e r 1
+        i r 1
+        o r 1
+        para r 1
+        se r 1
+        u r 1
+
+
+State 29
+        Prior States: 11
+
+        <S> ::= <COND> <S> _                           <S> ::= <COND> <S> ^
+
+        (EOF) r 3
+        '#' r 3
+        '*' r 3
+        a r 3
+        bin r 3
+        e r 3
+        i r 3
+        o r 3
+        para r 3
+        se r 3
+        u r 3
+
+
+State 30
+        Prior States: 12
+
+        <S> ::= <DEC> <S> _                            <S> ::= <DEC> <S> ^
+
+        (EOF) r 0
+        '#' r 0
+        '*' r 0
+        a r 0
+        bin r 0
+        e r 0
+        i r 0
+        o r 0
+        para r 0
+        se r 0
+        u r 0
+
+
+State 31
+        Prior States: 13
+
+        <S> ::= <REP> <S> _                            <S> ::= <REP> <S> ^
+
+        (EOF) r 2
+        '#' r 2
+        '*' r 2
+        a r 2
+        bin r 2
+        e r 2
+        i r 2
+        o r 2
+        para r 2
+        se r 2
+        u r 2
+
+
+State 32
+        Prior States: 15
+
+        <ATR> ::= <VAR> '~' _ <NUM>                    <ATR> ::= <VAR> '~' ^ <NUM>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+
+        '0' s 21
+        '1' s 22
+        <NUM> g 51
+
+
+State 33
+        Prior States: 16, 18, 19, 20, 27, 41, 42
+
+        <F> ::= '*' _                                  <F> ::= '*' ^
+
+        '#' r 26
+        '*' r 26
+        ';' r 26
+        '~' r 26
+        a r 26
+        bin r 26
+        e r 26
+        i r 26
+        igual r 26
+        maior r 26
+        menor r 26
+        o r 26
+        para r 26
+        se r 26
+        u r 26
+
+
+State 34
+        Prior States: 16
+
+        <VAR> ::= a <VAR> <F> _                        <VAR> ::= a <VAR> <F> ^
+
+        '#' r 21
+        '*' r 21
+        ';' r 21
+        '~' r 21
+        igual r 21
+        maior r 21
+        menor r 21
+
+
+State 35
+        Prior States: 17
+
+        <DATR> ::= ';' _ <S>                           <DATR> ::= ';' ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 52
+        <VAR> g 15
+
+
+State 36
+        Prior States: 17
+
+        <DATR> ::= '~' _ <NUM> ';' <S>                 <DATR> ::= '~' ^ <NUM> ';' <S>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+
+        '0' s 21
+        '1' s 22
+        <NUM> g 53
+
+
+State 37
+        Prior States: 17
+
+        <DEC> ::= bin <VAR> <DATR> _                   <DEC> ::= bin <VAR> <DATR> ^
+
+        '*' r 5
+        a r 5
+        bin r 5
+        e r 5
+        i r 5
+        o r 5
+        para r 5
+        se r 5
+        u r 5
+
+
+State 38
+        Prior States: 18
+
+        <VAR> ::= e <VAR> <F> _                        <VAR> ::= e <VAR> <F> ^
+
+        '#' r 22
+        '*' r 22
+        ';' r 22
+        '~' r 22
+        igual r 22
+        maior r 22
+        menor r 22
+
+
+State 39
+        Prior States: 19
+
+        <VAR> ::= i <VAR> <F> _                        <VAR> ::= i <VAR> <F> ^
+
+        '#' r 23
+        '*' r 23
+        ';' r 23
+        '~' r 23
+        igual r 23
+        maior r 23
+        menor r 23
+
+
+State 40
+        Prior States: 20
+
+        <VAR> ::= o <VAR> <F> _                        <VAR> ::= o <VAR> <F> ^
+
+        '#' r 24
+        '*' r 24
+        ';' r 24
+        '~' r 24
+        igual r 24
+        maior r 24
+        menor r 24
+
+
+State 41
+        Prior States: 21
+
+        <NUM> ::= '0' <NUM> _ <F>                      <NUM> ::= '0' <NUM> ^ <F>
+        <F> ::= _ '*'                                  <F> ::= ^ '*'
+
+        '*' s 33
+        <F> g 54
+
+
+State 42
+        Prior States: 22
+
+        <NUM> ::= '1' <NUM> _ <F>                      <NUM> ::= '1' <NUM> ^ <F>
+        <F> ::= _ '*'                                  <F> ::= ^ '*'
+
+        '*' s 33
+        <F> g 55
+
+
+State 43
+        Prior States: 23
+
+        <REP> ::= para <COMP> '#' _ <S> '#' <S>        <REP> ::= para <COMP> '#' ^ <S> '#' <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 56
+        <VAR> g 15
+
+
+State 44
+        Prior States: 24, 25
+
+        <OP> ::= igual _                               <OP> ::= igual ^
+
+        '0' r 16
+        '1' r 16
+        a r 16
+        e r 16
+        i r 16
+        o r 16
+        u r 16
+
+
+State 45
+        Prior States: 24, 25
+
+        <OP> ::= maior _                               <OP> ::= maior ^
+
+        '0' r 17
+        '1' r 17
+        a r 17
+        e r 17
+        i r 17
+        o r 17
+        u r 17
+
+
+State 46
+        Prior States: 24, 25
+
+        <OP> ::= menor _                               <OP> ::= menor ^
+
+        '0' r 18
+        '1' r 18
+        a r 18
+        e r 18
+        i r 18
+        o r 18
+        u r 18
+
+
+State 47
+        Prior States: 24
+
+        <COMP> ::= <NUM> <OP> _ <VAR>                  <COMP> ::= <NUM> <OP> ^ <VAR>
+        <COMP> ::= <NUM> <OP> _ <NUM>                  <COMP> ::= <NUM> <OP> ^ <NUM>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '0' s 21
+        '1' s 22
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <NUM> g 57
+        <VAR> g 58
+
+
+State 48
+        Prior States: 25
+
+        <COMP> ::= <VAR> <OP> _ <VAR>                  <COMP> ::= <VAR> <OP> ^ <VAR>
+        <COMP> ::= <VAR> <OP> _ <NUM>                  <COMP> ::= <VAR> <OP> ^ <NUM>
+        <NUM> ::= _ '0' <NUM> <F>                      <NUM> ::= ^ '0' <NUM> <F>
+        <NUM> ::= _ '1' <NUM> <F>                      <NUM> ::= ^ '1' <NUM> <F>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '0' s 21
+        '1' s 22
+        a s 2
+        e s 4
+        i s 5
+        o s 6
+        u s 9
+        <NUM> g 59
+        <VAR> g 60
+
+
+State 49
+        Prior States: 26
+
+        <COND> ::= se <COMP> '#' _ <S> '#' <S>         <COND> ::= se <COMP> '#' ^ <S> '#' <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 61
+        <VAR> g 15
+
+
+State 50
+        Prior States: 27
+
+        <VAR> ::= u <VAR> <F> _                        <VAR> ::= u <VAR> <F> ^
+
+        '#' r 25
+        '*' r 25
+        ';' r 25
+        '~' r 25
+        igual r 25
+        maior r 25
+        menor r 25
+
+
+State 51
+        Prior States: 32
+
+        <ATR> ::= <VAR> '~' <NUM> _                    <ATR> ::= <VAR> '~' <NUM> ^
+
+        '*' r 6
+        a r 6
+        bin r 6
+        e r 6
+        i r 6
+        o r 6
+        para r 6
+        se r 6
+        u r 6
+
+
+State 52
+        Prior States: 35
+
+        <DATR> ::= ';' <S> _                           <DATR> ::= ';' <S> ^
+
+        '*' r 7
+        a r 7
+        bin r 7
+        e r 7
+        i r 7
+        o r 7
+        para r 7
+        se r 7
+        u r 7
+
+
+State 53
+        Prior States: 36
+
+        <DATR> ::= '~' <NUM> _ ';' <S>                 <DATR> ::= '~' <NUM> ^ ';' <S>
+
+        ';' s 62
+
+
+State 54
+        Prior States: 41
+
+        <NUM> ::= '0' <NUM> <F> _                      <NUM> ::= '0' <NUM> <F> ^
+
+        '#' r 19
+        '*' r 19
+        ';' r 19
+        a r 19
+        bin r 19
+        e r 19
+        i r 19
+        igual r 19
+        maior r 19
+        menor r 19
+        o r 19
+        para r 19
+        se r 19
+        u r 19
+
+
+State 55
+        Prior States: 42
+
+        <NUM> ::= '1' <NUM> <F> _                      <NUM> ::= '1' <NUM> <F> ^
+
+        '#' r 20
+        '*' r 20
+        ';' r 20
+        a r 20
+        bin r 20
+        e r 20
+        i r 20
+        igual r 20
+        maior r 20
+        menor r 20
+        o r 20
+        para r 20
+        se r 20
+        u r 20
+
+
+State 56
+        Prior States: 43
+
+        <REP> ::= para <COMP> '#' <S> _ '#' <S>        <REP> ::= para <COMP> '#' <S> ^ '#' <S>
+
+        '#' s 63
+
+
+State 57
+        Prior States: 47
+
+        <COMP> ::= <NUM> <OP> <NUM> _                  <COMP> ::= <NUM> <OP> <NUM> ^
+
+        '#' r 15
+
+
+State 58
+        Prior States: 47
+
+        <COMP> ::= <NUM> <OP> <VAR> _                  <COMP> ::= <NUM> <OP> <VAR> ^
+
+        '#' r 14
+
+
+State 59
+        Prior States: 48
+
+        <COMP> ::= <VAR> <OP> <NUM> _                  <COMP> ::= <VAR> <OP> <NUM> ^
+
+        '#' r 13
+
+
+State 60
+        Prior States: 48
+
+        <COMP> ::= <VAR> <OP> <VAR> _                  <COMP> ::= <VAR> <OP> <VAR> ^
+
+        '#' r 12
+
+
+State 61
+        Prior States: 49
+
+        <COND> ::= se <COMP> '#' <S> _ '#' <S>         <COND> ::= se <COMP> '#' <S> ^ '#' <S>
+
+        '#' s 64
+
+
+State 62
+        Prior States: 53
+
+        <DATR> ::= '~' <NUM> ';' _ <S>                 <DATR> ::= '~' <NUM> ';' ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 65
+        <VAR> g 15
+
+
+State 63
+        Prior States: 56
+
+        <REP> ::= para <COMP> '#' <S> '#' _ <S>        <REP> ::= para <COMP> '#' <S> '#' ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 66
+        <VAR> g 15
+
+
+State 64
+        Prior States: 61
+
+        <COND> ::= se <COMP> '#' <S> '#' _ <S>         <COND> ::= se <COMP> '#' <S> '#' ^ <S>
+        <S> ::= _ <DEC> <S>                            <S> ::= ^ <DEC> <S>
+        <S> ::= _ <ATR> <S>                            <S> ::= ^ <ATR> <S>
+        <S> ::= _ <REP> <S>                            <S> ::= ^ <REP> <S>
+        <S> ::= _ <COND> <S>                           <S> ::= ^ <COND> <S>
+        <S> ::= _ '*'                                  <S> ::= ^ '*'
+        <DEC> ::= _ bin <VAR> <DATR>                   <DEC> ::= ^ bin <VAR> <DATR>
+        <ATR> ::= _ <VAR> '~' <NUM>                    <ATR> ::= ^ <VAR> '~' <NUM>
+        <COND> ::= _ se <COMP> '#' <S> '#' <S>         <COND> ::= ^ se <COMP> '#' <S> '#' <S>
+        <REP> ::= _ para <COMP> '#' <S> '#' <S>        <REP> ::= ^ para <COMP> '#' <S> '#' <S>
+        <VAR> ::= _ a <VAR> <F>                        <VAR> ::= ^ a <VAR> <F>
+        <VAR> ::= _ e <VAR> <F>                        <VAR> ::= ^ e <VAR> <F>
+        <VAR> ::= _ i <VAR> <F>                        <VAR> ::= ^ i <VAR> <F>
+        <VAR> ::= _ o <VAR> <F>                        <VAR> ::= ^ o <VAR> <F>
+        <VAR> ::= _ u <VAR> <F>                        <VAR> ::= ^ u <VAR> <F>
+
+        '*' s 1
+        a s 2
+        bin s 3
+        e s 4
+        i s 5
+        o s 6
+        para s 7
+        se s 8
+        u s 9
+        <ATR> g 10
+        <COND> g 11
+        <DEC> g 12
+        <REP> g 13
+        <S> g 67
+        <VAR> g 15
+
+
+State 65
+        Prior States: 62
+
+        <DATR> ::= '~' <NUM> ';' <S> _                 <DATR> ::= '~' <NUM> ';' <S> ^
+
+        '*' r 8
+        a r 8
+        bin r 8
+        e r 8
+        i r 8
+        o r 8
+        para r 8
+        se r 8
+        u r 8
+
+
+State 66
+        Prior States: 63
+
+        <REP> ::= para <COMP> '#' <S> '#' <S> _        <REP> ::= para <COMP> '#' <S> '#' <S> ^
+
+        '*' r 10
+        a r 10
+        bin r 10
+        e r 10
+        i r 10
+        o r 10
+        para r 10
+        se r 10
+        u r 10
+
+
+State 67
+        Prior States: 64
+
+        <COND> ::= se <COMP> '#' <S> '#' <S> _         <COND> ::= se <COMP> '#' <S> '#' <S> ^
+
+        '*' r 9
+        a r 9
+        bin r 9
+        e r 9
+        i r 9
+        o r 9
+        para r 9
+        se r 9
+        u r 9
+
+
+
+
+========================================
+System Log
+========================================
+
+Grammar        Success           The grammar was successfully analyzed
+LALR States    Success           LALR Table was succesfully created
+
+

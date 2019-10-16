@@ -1,6 +1,6 @@
 import csv
-arquivo = list(open('tokens.txt'))
-codigo  = list(open('codigo.txt'))
+arquivo = list(open('config/tokens.txt'))
+codigo  = list(open('config/codigo.txt'))
 
 simbolos = []
 estados = []
