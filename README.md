@@ -1,5 +1,5 @@
 # Projeto e implementação das etapas de compilação para uma linguagem de programação hipotética.
-Vitor Antônio Apolinário e Willian Bordignon Genero
+Vitor Antonio Apolinário e Willian Bordignon Genero
 
 ## Análise Léxica
 * Implementar analisador léxico;
