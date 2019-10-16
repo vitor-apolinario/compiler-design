@@ -1,6 +1,10 @@
+import xml.etree.ElementTree as ET
 import csv
+
 arquivo = list(open('config/tokens.txt'))
 codigo  = list(open('config/codigo.txt'))
+tree = ET.parse('config/tabParsing.xml')
+root = tree.getroot()
 
 simbolos = []
 estados = []
@@ -297,6 +301,24 @@ def main():
         for token in tS[linha]:
             if token and token[0] == '€':
                 print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
+
+    alfabeto = {}
+    LALRTable = {}
+
+    simbolosTabela = root.iter('m_Symbol')
+    for simbolo in simbolosTabela:
+        for x in simbolo:
+            alfabeto[x.attrib['Index']] = x.attrib['Name']
+
+    LALR = root.iter('LALRTable')
+    for table in LALR:
+        for state in table:
+            LALRTable[state.attrib['Index']] = {}
+            for action in state:
+                LALRTable[state.attrib['Index']][action.attrib['SymbolIndex']] = action.attrib['Action'], action.attrib['Value']
+
+    print('Alfabeto: ', alfabeto)
+    print('\nLALR: ', LALRTable)
 
 print('\n' * 45)
 main()
