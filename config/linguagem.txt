@@ -1,7 +1,9 @@
 "Start Symbol" = <S>
-<S> ::= <DEC> <S> | <ATR> <S> | <REP> <S> | <COND> <S> | '*'
+<S> ::= <DEC> <S> | <ATR> <S> | <REP> <S> | <COND> <S> | <F>
 <DEC> ::= 'bin' <VAR> <DATR>
-<ATR> ::= <VAR> '~' <NUM>
+<ATR> ::= <VAR> '~' <VALOR>
+<VALOR> ::= <NUM> | <VAR> <OPMAT> <VAR> | <VAR> <OPMAT> <NUM>
+<OPMAT> ::= '+' | '-'
 <DATR> ::= ';' <S> | '~' <NUM> ';' <S>
 <COND> ::= 'se' <COMP> '#' <S> '#' <S>
 <REP> ::= 'para' <COMP> '#' <S> '#' <S>
@@ -9,4 +11,4 @@
 <OP> ::= 'igual' | 'maior' | 'menor'
 <NUM> ::= '0' <NUM> <F> | '1' <NUM> <F>
 <VAR> ::= 'a' <VAR> <F> | 'e' <VAR> <F> | 'i' <VAR> <F> | 'o' <VAR> <F> | 'u' <VAR> <F>
-<F> ::= '*'
+<F> ::= <>
