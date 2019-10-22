@@ -219,11 +219,13 @@ def estado_erro():
             if not tabela[regra][simbolo]:
                 tabela[regra][simbolo] = ['€']
 
-def analisadorLexico():
+
+def analisador_lexico():
     tS = {}
     fitaSaida = []
-    separadores = [' ', '\n', '\t', '+', '-', '#', '~', ';']
-    operadores  = ['+', '-', '#', '~', ';']
+    separadores = [' ', '\n', '\t', '+', '-', '{', '}', '~', '.']
+    espacadores = [' ', '\n', '\t']
+    operadores  = ['+', '-', '~']
     for idx, linha in enumerate(codigo):
         E = 'S'
         string = ''
@@ -255,7 +257,7 @@ def analisadorLexico():
                     else:
                         E = tabela[E][char][0]
             else:
-                if char in separadores:
+                if char in espacadores:
                     continue
                 if char not in separadores and char not in operadores and string:
                     if string[-1] in operadores:
@@ -277,8 +279,10 @@ def analisadorLexico():
         for token in tS[linha]:
             if token and token[0] == '€':
                 print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
+    print(fitaSaida)
 
-def analisadorSintatico():
+
+def analisador_sintatico():
     alfabeto = {}
     LALRTable = {}
 
@@ -317,8 +321,8 @@ def main():
     buscar_vivos()
     eliminar_mortos()
     criar_csv()
-    analisadorLexico()
-    analisadorSintatico()
+    analisador_lexico()
+    # analisador_sintatico()
 
 
 print('\n' * 45)

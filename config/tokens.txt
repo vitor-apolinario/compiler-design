@@ -4,12 +4,13 @@
 <A> ::= *
 bin
 se
-para
+enquanto
 igual
 menor
 maior
 ~
 +
 -
-;
-#
+{
+}
+.

@@ -1,3 +1,11 @@
-se w maior x#
-bin eee ~100;
-#
+bin a.
+bin ae ~ 0.
+se ae menor 1 {
+    bin aei ~ 10.
+}
+enquanto aei maior 100 {
+    bin aeio ~ 1001.
+    se 1001 menor 1000 {
+        bin aeiou ~ 1111.
+    }
+}
