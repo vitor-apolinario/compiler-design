@@ -29,8 +29,8 @@ Vitor Antonio Apolinário e Willian Bordignon Genero
 * Aplicar uma estratégia de otimização de código sobre o código intermediário gerado.
 
 ### Situação atual
-[x] Análise léxica.
-[ ] Análise sintática.
-[ ] Análise semântica.
-[ ] Geração de código intermediário.
-[ ] Otimização de código.
+- [X] Análise léxica.
+- [ ] Análise sintática.
+- [ ] Análise semântica.
+- [ ] Geração de código intermediário.
+- [ ] Otimização de código.

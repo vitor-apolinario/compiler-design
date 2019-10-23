@@ -15,7 +15,9 @@ finais = []
 vivos = []
 epTransicao = {}
 repeticao = 0
-
+tS = {}
+fitaSaida = []
+fita = []
 
 def eliminar_mortos():
     mortos = []
@@ -221,8 +223,6 @@ def estado_erro():
 
 
 def analisador_lexico():
-    tS = {}
-    fitaSaida = []
     separadores = [' ', '\n', '\t', '+', '-', '{', '}', '~', '.']
     espacadores = [' ', '\n', '\t']
     operadores  = ['+', '-', '~']
@@ -279,27 +279,49 @@ def analisador_lexico():
         for token in tS[linha]:
             if token and token[0] == '€':
                 print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
-    print(fitaSaida)
+
+
+def mapeamento(alfabeto, af):
+    mapi, aux = {}, []
+    for dfa in af:
+        mapi[dfa] = alfabeto[af[dfa]]    
+
+    for fta in fitaSaida:
+        if fta == 'S1':
+            aux.append('VAR')
+        elif fta == 'S2':
+            aux.append('NUM')
+        else:
+            aux.append(fta)
+    for fta in aux:
+        for m in mapi:
+            if mapi[m].upper() == fta:
+                fita.append(m)
+    print('\nNewFita: ', fita)
 
 
 def analisador_sintatico():
-    alfabeto = {}
-    LALRTable = {}
+    alfabeto, LALRTable, af = {}, {}, {}
 
     simbolosTabela = root.iter('m_Symbol')
     for simbolo in simbolosTabela:
         for x in simbolo:
             alfabeto[x.attrib['Index']] = x.attrib['Name']
 
+    dfa = root.iter('DFATable')
+    for table in dfa:
+        for state in table:
+            if state.attrib['AcceptSymbol'] != '-1':
+                af[state.attrib['Index']] = state.attrib['AcceptSymbol']
+
+    mapeamento(alfabeto, af)
+    
     LALR = root.iter('LALRTable')
     for table in LALR:
         for state in table:
             LALRTable[state.attrib['Index']] = {}
             for action in state:
                 LALRTable[state.attrib['Index']][action.attrib['SymbolIndex']] = action.attrib['Action'], action.attrib['Value']
-
-    print('\nAlfabeto: ', alfabeto)
-    print('\nLALR: ', LALRTable)
 
 def main():
     gramatica['S'] = []
@@ -322,7 +344,7 @@ def main():
     eliminar_mortos()
     criar_csv()
     analisador_lexico()
-    # analisador_sintatico()
+    analisador_sintatico()
 
 
 print('\n' * 45)
