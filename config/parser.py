@@ -92,3 +92,5 @@ while True:
 print(action)
 print(state)
 print(fita)
+
+# teste
