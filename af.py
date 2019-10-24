@@ -225,22 +225,13 @@ def estado_erro():
 def analisador_lexico():
     separadores = [' ', '\n', '\t', '+', '-', '{', '}', '~', '.']
     espacadores = [' ', '\n', '\t']
-    operadores  = ['+', '-', '~']
+    operadores  = ['+', '-', '~', '.']
     for idx, linha in enumerate(codigo):
         E = 'S'
         string = ''
         tS[idx] = [] 
         for char in linha:
-            if char in separadores and string:
-                if E in finais:
-                    tS[idx].append(E + ':' + string)
-                    fitaSaida.append(E)
-                else:
-                    tS[idx].append('€' + ':' + string)
-                    fitaSaida.append('€')
-                E = 'S'
-                string = ''
-            elif char in operadores and string:                             # Se lemos um operador e temos uma string não vazia
+            if char in operadores and string:                             # Se lemos um operador e temos uma string não vazia
                 if string[-1] not in operadores:                            # Se o ultimo caractere reconhecido não é um operador:
                     if E in finais:                                             # O operador lido atualmente é um separador
                         tS[idx].append(E + ':' + string)                        # Logo devemos reconhecer a string anterior e continuar a leitura
@@ -256,6 +247,15 @@ def analisador_lexico():
                         E = '€'
                     else:
                         E = tabela[E][char][0]
+            elif char in separadores and string:
+                if E in finais:
+                    tS[idx].append(E + ':' + string)
+                    fitaSaida.append(E)
+                else:
+                    tS[idx].append('€' + ':' + string)
+                    fitaSaida.append('€')
+                E = 'S'
+                string = ''
             else:
                 if char in espacadores:
                     continue
@@ -297,7 +297,7 @@ def mapeamento(alfabeto, af):
         for m in mapi:
             if mapi[m].upper() == fta:
                 fita.append(m)
-    print('\nNewFita: ', fita)
+    fita.append('EOF')
 
 
 def analisador_sintatico():
@@ -316,12 +316,6 @@ def analisador_sintatico():
 
     mapeamento(alfabeto, af)
     
-    LALR = root.iter('LALRTable')
-    for table in LALR:
-        for state in table:
-            LALRTable[state.attrib['Index']] = {}
-            for action in state:
-                LALRTable[state.attrib['Index']][action.attrib['SymbolIndex']] = action.attrib['Action'], action.attrib['Value']
 
 def main():
     gramatica['S'] = []
@@ -344,47 +338,10 @@ def main():
     eliminar_mortos()
     criar_csv()
     analisador_lexico()
+    print('OldFita: ', fitaSaida)
     analisador_sintatico()
-
+    print('\nNewFita: ', fita)
+    
 
 print('\n' * 45)
 main()
-
-
-# gramatica exemplo
-# if
-# <S> ::= a<A> | b<B>
-# <A> ::= x
-# <B> ::= z
-# else
-
-# se
-# entao
-# senao
-# <S> ::= a<A> | e<A> | i<A> | o<A> | u<A>
-# <A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
-
-# se
-# entao
-# senao
-# <S> ::= a<A> | e<A> | i<A> | o<A> | u<A> | <A>
-# <A> ::= a<A> | e<A> | i<A> | o<A> | u<A> | *
-
-# <S> ::= a<S> | <A>
-# <A> ::= b<A> | <B>
-# <B> ::= c<B> | *
-
-# if
-# <S> ::= a<A> | b<B> | b | c<S> | c | *
-# <A> ::= a<S> | a | b<C> | c<A>
-# <B> ::= a<A> | c<B> | c<S> | c
-# <C> ::= a<S> | a | c<A> | c<C>
-# else
-
-# <S> ::= a<A> | a | b | c<C> | b<D>
-# <A> ::= a<B> | b<A> | c<B> | *
-# <B> ::= a<A> | b<B> | c<A> | a | c
-# <C> ::= a<C> | b<D> | c<C> | b
-# <D> ::= a<D> | b<C> | c<C> | * | c | a
-# <E> ::= a<C> | b<F> | a
-# <F> ::= b<E> | c<B> | b
