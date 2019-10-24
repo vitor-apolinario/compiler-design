@@ -2,9 +2,10 @@ import xml.etree.ElementTree as ET
 tree = ET.parse('tabParsing.xml')
 root = tree.getroot()
 
-fita = ['BIN', 'VAR', '~', 'NUM', '.', 'SE', 'VAR', 'MENOR', 'NUM', '{', 'VAR', '~', 'NUM', '.', '}', 'EOF']
+# fita = ['BIN', 'VAR', '~', 'NUM', '.', 'SE', 'VAR', 'MENOR', 'NUM', '{', 'VAR', '~', 'NUM', '.', '}', 'EOF']
+fita = ['7', '14', '6', '12', '3', '13', '14', '11', '12', '4', '14', '6', '12', '3', '5', '0']
+
 symbols = []
-symbols_indexes = {}
 productions = []
 lalr_table = []
 
@@ -20,12 +21,6 @@ for symbol in xml_symbols:
     })
 
 
-# dicionário pra descobrir rapidamente qual é
-# o índice na tabela de um determinado estado
-for index, symbol in enumerate(symbols):
-    symbols_indexes[symbol['Name']] = str(index)
-
-
 # criação do vetor "productions", cada posição é um
 # dicionário que representa uma produção e contém
 # índice do NT, quantidade de simbolos e a
@@ -35,10 +30,10 @@ for production in xml_productions:
     productions.append({
         'NonTerminalIndex': production.attrib['NonTerminalIndex'],
         'SymbolCount': int(production.attrib['SymbolCount']),
-        'String': symbols[int(production.attrib['NonTerminalIndex'])]['Name'] + ' ::='
+        # 'String': symbols[int(production.attrib['NonTerminalIndex'])]['Name'] + ' ::='
     })
-    for prod_symbol in production:
-        productions[len(productions)-1]['String'] += ' ' + symbols[int(prod_symbol.attrib['SymbolIndex'])]['Name']
+    # for prod_symbol in production:
+    #     productions[len(productions)-1]['String'] += ' ' + symbols[int(prod_symbol.attrib['SymbolIndex'])]['Name']
 
 
 # vetor mapeamento da tabela lalr em ações
@@ -59,7 +54,6 @@ for state in lalr_states:
 
 
 print(symbols)
-print(symbols_indexes)
 print(productions)
 print(lalr_table)
 
@@ -69,7 +63,11 @@ i = 0                   #utilizado para testar
 while True:
     i += 1
     ultimo_fita = fita[0]
-    action = lalr_table[int(state[0])][symbols_indexes[ultimo_fita]]
+    try:
+        action = lalr_table[int(state[0])][ultimo_fita]
+    except:
+        print('O trecho possui erros sintáticos ou semânticos')
+        break
 
     if action['Action'] == '1':
         state.insert(0, fita.pop(0))
@@ -80,8 +78,8 @@ while True:
             state.pop(0)
             size -= 1
         # salto
-        state.insert(0, symbols[int(productions[int(action['Value'])]['NonTerminalIndex'])]['Name'])
-        state.insert(0, lalr_table[int(state[1])][symbols_indexes[state[0]]]['Value'])
+        state.insert(0, productions[int(action['Value'])]['NonTerminalIndex'])
+        state.insert(0, lalr_table[int(state[1])][state[0]]['Value'])
     elif action['Action'] == '3':
         print('salto')
     elif action['Action'] == '4':
@@ -94,7 +92,3 @@ while True:
 print(action)
 print(state)
 print(fita)
-
-
-
-#eoq teste
