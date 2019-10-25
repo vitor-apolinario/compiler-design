@@ -6,18 +6,9 @@ codigo  = list(open('config/codigo.txt'))
 tree = ET.parse('config/tabParsing.xml')
 root = tree.getroot()
 
-simbolos = []
-estados = []
-alcan = []
-gramatica = {}
-tabela = {}
-finais = []
-vivos = []
-epTransicao = {}
+simbolos, estados, alcan, finais, vivos, tS, fitaSaida, fita = [], [], [], [], [], [], [], []
+gramatica, tabela, epTransicao = {}, {}, {}
 repeticao = 0
-tS = {}
-fitaSaida = []
-fita = []
 
 def eliminar_mortos():
     mortos = []
@@ -229,31 +220,30 @@ def analisador_lexico():
     for idx, linha in enumerate(codigo):
         E = 'S'
         string = ''
-        tS[idx] = [] 
         for char in linha:
-            if char in operadores and string:                             # Se lemos um operador e temos uma string não vazia
-                if string[-1] not in operadores:                            # Se o ultimo caractere reconhecido não é um operador:
-                    if E in finais:                                             # O operador lido atualmente é um separador
-                        tS[idx].append(E + ':' + string)                        # Logo devemos reconhecer a string anterior e continuar a leitura
+            if char in operadores and string:                                 # Se lemos um operador e temos uma string não vazia
+                if string[-1] not in operadores:                              # Se o ultimo caractere reconhecido não é um operador:
+                    if E in finais:                                           # O operador lido atualmente é um separador
+                        tS.append({'Line': idx, 'State': E, 'Label': string}) # Logo devemos reconhecer a string anterior e continuar a leitura
                         fitaSaida.append(E)
                     else:
-                        tS[idx].append('€' + ':' + string)
-                        fitaSaida.append('€')
-                    E = tabela['S'][char][0]                               # É iniciado o mapeamento da próxima estrutura de operadores
+                        tS.append({'Line': idx, 'State': 'Error', 'Label': string})
+                        fitaSaida.append('Error')
+                    E = tabela['S'][char][0]                                    # É iniciado o mapeamento da próxima estrutura de operadores
                     string = char
-                else:                                                      # Caso o último caractere reconhecido seja um operador
-                    string += char                                           # continuamos o mapeamento normalmente
+                else:                                                         # Caso o último caractere reconhecido seja um operador
+                    string += char                                            # continuamos o mapeamento normalmente
                     if char not in simbolos:
                         E = '€'
                     else:
                         E = tabela[E][char][0]
             elif char in separadores and string:
                 if E in finais:
-                    tS[idx].append(E + ':' + string)
+                    tS.append({'Line': idx, 'State': E, 'Label': string})
                     fitaSaida.append(E)
                 else:
-                    tS[idx].append('€' + ':' + string)
-                    fitaSaida.append('€')
+                    tS.append({'Line': idx, 'State': 'Error', 'Label': string})
+                    fitaSaida.append('Error')
                 E = 'S'
                 string = ''
             else:
@@ -262,11 +252,11 @@ def analisador_lexico():
                 if char not in separadores and char not in operadores and string:
                     if string[-1] in operadores:
                         if E in finais:                                             # O operador lido atualmente é um separador
-                            tS[idx].append(E + ':' + string)                        # Logo devemos reconhecer a string anterior e continuar a leitura
+                            tS.append({'Line': idx, 'State': E, 'Label': string})
                             fitaSaida.append(E)
                         else:
-                            tS[idx].append('€' + ':' + string)
-                            fitaSaida.append('€')
+                            tS.append({'Line': idx, 'State': 'Error', 'Label': string})
+                            fitaSaida.append('Error')
                         E = 'S'
                         string = ''
                 string += char
@@ -274,13 +264,15 @@ def analisador_lexico():
                     E = '€'
                 else:
                     E = tabela[E][char][0]
-    fitaSaida.append('$')
+    tS.append({'Line': idx, 'State': 'EOF', 'Label': ''})
+    fitaSaida.append('EOF')
+    erro = False
     for linha in tS:
-        for token in tS[linha]:
-            if token and token[0] == '€':
-                print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
-
-
+        if linha['State'] == 'Error':
+            erro = True
+            print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha['Line']+1, linha['Label']))
+    if erro:
+        exit()
 # Função que inicialmente troca na fitaSaida os estados S1 e S2 por VAR e NUM, respectivamente
 # Por fim, altera o estados que eram nomes pelo indice para ser reconhecido no analisador sintático
 def mapeamento(symbols):
@@ -299,23 +291,23 @@ def mapeamento(symbols):
             fta = 'EOF'
 
         fita.append(symbols_indexes[fta])
-    fita.append('0')
 
 
 def analisador_sintatico():
-
     def parser():
+        idx = 0
         while True:
             ultimo_fita = fita[0]
             try:
                 action = lalr_table[int(state[0])][ultimo_fita]
             except:
-                print('Erro sintático:')
+                print('Erro sintático: linha {}, sentença "{}" não reconhecida!'.format(tS[idx]['Line']+1, tS[idx]['Label']))
                 break
 
             if action['Action'] == '1':
                 state.insert(0, fita.pop(0))
                 state.insert(0, action['Value'])
+                idx += 1
             elif action['Action'] == '2':
                 size = productions[int(action['Value'])]['SymbolCount'] * 2
                 while size:
