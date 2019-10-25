@@ -281,21 +281,62 @@ def analisador_lexico():
                 print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
 
 
+# Função que inicialmente troca na fitaSaida os estados S1 e S2 por VAR e NUM, respectivamente
+# Por fim, altera o estados que eram nomes pelo indice para ser reconhecido no analisador sintático
 def mapeamento(symbols):
-    # Função que inicialmente troca na fitaSaida os estados S1 e S2 por VAR e NUM, respectivamente
-    # Por fim, altera o estados que eram nomes pelo indice para ser reconhecido no analisador sintático
+    symbols_indexes = {}
+
+    # faz um "mapeamento reverso" { 'SymbolName': 'SymbolIndex' }
+    for index, symbol in enumerate(symbols):
+        symbols_indexes[symbol['Name']] = str(index)
+
     for fta in fitaSaida:
         if fta == 'S1':
             fta = 'VAR'
         elif fta == 'S2':
             fta = 'NUM'
-        for symbol in symbols:
-            if fta == symbol['Name']:
-                fita.append(symbol['Index'])
+        elif fta == '$':
+            fta = 'EOF'
+
+        fita.append(symbols_indexes[fta])
     fita.append('0')
 
+
 def analisador_sintatico():
+
+    def parser():
+        while True:
+            ultimo_fita = fita[0]
+            try:
+                action = lalr_table[int(state[0])][ultimo_fita]
+            except:
+                print('Erro sintático:')
+                break
+
+            if action['Action'] == '1':
+                state.insert(0, fita.pop(0))
+                state.insert(0, action['Value'])
+            elif action['Action'] == '2':
+                size = productions[int(action['Value'])]['SymbolCount'] * 2
+                while size:
+                    state.pop(0)
+                    size -= 1
+                # salto
+                state.insert(0, productions[int(action['Value'])]['NonTerminalIndex'])
+                state.insert(0, lalr_table[int(state[1])][state[0]]['Value'])
+            elif action['Action'] == '3':
+                print('salto')
+            elif action['Action'] == '4':
+                print('Código aceito')
+                break
+
+        # print(action)
+        # print(state)
+        # print(fita)
+
     symbols = []
+    productions = []
+    lalr_table = []
 
     xml_symbols = root.iter('Symbol')
     for symbol in xml_symbols:
@@ -305,7 +346,25 @@ def analisador_sintatico():
             'Type': symbol.attrib['Type']
         })
 
+    xml_productions = root.iter('Production')
+    for production in xml_productions:
+        productions.append({
+            'NonTerminalIndex': production.attrib['NonTerminalIndex'],
+            'SymbolCount': int(production.attrib['SymbolCount']),
+        })
+
+    lalr_states = root.iter('LALRState')
+    for state in lalr_states:
+        lalr_table.append({})
+        for action in state:
+            lalr_table[int(state.attrib['Index'])][str(action.attrib['SymbolIndex'])] = {
+                'Action': action.attrib['Action'],
+                'Value': action.attrib['Value']
+            }
+
+    state = ['0']
     mapeamento(symbols)
+    parser()
     
 
 def main():
@@ -330,8 +389,8 @@ def main():
     criar_csv()
     analisador_lexico()
     analisador_sintatico()
-    print('OldFita: ', fitaSaida)
-    print('\nNewFita: ', fita)
+    # print('OldFita: ', fitaSaida)
+    # print('\nNewFita: ', fita)
     
 
 print('\n' * 45)
