@@ -281,40 +281,31 @@ def analisador_lexico():
                 print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha,token.split(':')[-1]))
 
 
-def mapeamento(alfabeto, af):
-    mapi, aux = {}, []
-    for dfa in af:
-        mapi[dfa] = alfabeto[af[dfa]]    
-
+def mapeamento(symbols):
+    # Função que inicialmente troca na fitaSaida os estados S1 e S2 por VAR e NUM, respectivamente
+    # Por fim, altera o estados que eram nomes pelo indice para ser reconhecido no analisador sintático
     for fta in fitaSaida:
         if fta == 'S1':
-            aux.append('VAR')
+            fta = 'VAR'
         elif fta == 'S2':
-            aux.append('NUM')
-        else:
-            aux.append(fta)
-    for fta in aux:
-        for m in mapi:
-            if mapi[m].upper() == fta:
-                fita.append(m)
-    fita.append('EOF')
-
+            fta = 'NUM'
+        for symbol in symbols:
+            if fta == symbol['Name']:
+                fita.append(symbol['Index'])
+    fita.append('0')
 
 def analisador_sintatico():
-    alfabeto, LALRTable, af = {}, {}, {}
+    symbols = []
 
-    simbolosTabela = root.iter('m_Symbol')
-    for simbolo in simbolosTabela:
-        for x in simbolo:
-            alfabeto[x.attrib['Index']] = x.attrib['Name']
+    xml_symbols = root.iter('Symbol')
+    for symbol in xml_symbols:
+        symbols.append({
+            'Index': symbol.attrib['Index'],
+            'Name': symbol.attrib['Name'],
+            'Type': symbol.attrib['Type']
+        })
 
-    dfa = root.iter('DFATable')
-    for table in dfa:
-        for state in table:
-            if state.attrib['AcceptSymbol'] != '-1':
-                af[state.attrib['Index']] = state.attrib['AcceptSymbol']
-
-    mapeamento(alfabeto, af)
+    mapeamento(symbols)
     
 
 def main():
@@ -338,8 +329,8 @@ def main():
     eliminar_mortos()
     criar_csv()
     analisador_lexico()
-    print('OldFita: ', fitaSaida)
     analisador_sintatico()
+    print('OldFita: ', fitaSaida)
     print('\nNewFita: ', fita)
     
 
