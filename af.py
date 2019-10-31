@@ -7,7 +7,7 @@ tree = ET.parse('config/tabParsing.xml')
 root = tree.getroot()
 
 simbolos, estados, alcan, finais, vivos, tS, fitaSaida, fita = [], [], [], [], [], [], [], []
-gramatica, tabela, epTransicao = {}, {}, {}
+gramatica, tabela, epTransicao, idxSymbolRedux = {}, {}, {}, {}
 repeticao = 0
 
 def eliminar_mortos():
@@ -217,6 +217,7 @@ def analisador_lexico():
     separadores = [' ', '\n', '\t', '+', '-', '{', '}', '~', '.']
     espacadores = [' ', '\n', '\t']
     operadores  = ['+', '-', '~', '.']
+    id = 0
     for idx, linha in enumerate(codigo):
         E = 'S'
         string = ''
@@ -224,13 +225,14 @@ def analisador_lexico():
             if char in operadores and string:                                 # Se lemos um operador e temos uma string não vazia
                 if string[-1] not in operadores:                              # Se o ultimo caractere reconhecido não é um operador:
                     if E in finais:                                           # O operador lido atualmente é um separador
-                        tS.append({'Line': idx, 'State': E, 'Label': string}) # Logo devemos reconhecer a string anterior e continuar a leitura
+                        tS.append({'Line': idx, 'State': E, 'Label': string, 'Id': id}) # Logo devemos reconhecer a string anterior e continuar a leitura
                         fitaSaida.append(E)
                     else:
-                        tS.append({'Line': idx, 'State': 'Error', 'Label': string})
+                        tS.append({'Line': idx, 'State': 'Error', 'Label': string, 'Id': id})
                         fitaSaida.append('Error')
                     E = tabela['S'][char][0]                                    # É iniciado o mapeamento da próxima estrutura de operadores
                     string = char
+                    id += 1
                 else:                                                         # Caso o último caractere reconhecido seja um operador
                     string += char                                            # continuamos o mapeamento normalmente
                     if char not in simbolos:
@@ -239,32 +241,34 @@ def analisador_lexico():
                         E = tabela[E][char][0]
             elif char in separadores and string:
                 if E in finais:
-                    tS.append({'Line': idx, 'State': E, 'Label': string})
+                    tS.append({'Line': idx, 'State': E, 'Label': string, 'Id': id})
                     fitaSaida.append(E)
                 else:
-                    tS.append({'Line': idx, 'State': 'Error', 'Label': string})
+                    tS.append({'Line': idx, 'State': 'Error', 'Label': string, 'Id': id})
                     fitaSaida.append('Error')
                 E = 'S'
                 string = ''
+                id += 1
             else:
                 if char in espacadores:
                     continue
                 if char not in separadores and char not in operadores and string:
                     if string[-1] in operadores:
                         if E in finais:                                             # O operador lido atualmente é um separador
-                            tS.append({'Line': idx, 'State': E, 'Label': string})
+                            tS.append({'Line': idx, 'State': E, 'Label': string, 'Id': id})
                             fitaSaida.append(E)
                         else:
-                            tS.append({'Line': idx, 'State': 'Error', 'Label': string})
+                            tS.append({'Line': idx, 'State': 'Error', 'Label': string, 'Id': id})
                             fitaSaida.append('Error')
                         E = 'S'
                         string = ''
+                        id += 1
                 string += char
                 if char not in simbolos:
                     E = '€'
                 else:
                     E = tabela[E][char][0]
-    tS.append({'Line': idx, 'State': 'EOF', 'Label': ''})
+    tS.append({'Line': idx, 'State': 'EOF', 'Label': '', 'Id': id})
     fitaSaida.append('EOF')
     erro = False
     for linha in tS:
@@ -276,12 +280,10 @@ def analisador_lexico():
 # Função que inicialmente troca na fitaSaida os estados S1 e S2 por VAR e NUM, respectivamente
 # Por fim, altera o estados que eram nomes pelo indice para ser reconhecido no analisador sintático
 def mapeamento(symbols):
-    symbols_indexes = {}
-
-    # faz um "mapeamento reverso" { 'SymbolName': 'SymbolIndex' }
+    symbols_indexes = {}    # faz um "mapeamento reverso" { 'SymbolName': 'SymbolIndex' }
     for index, symbol in enumerate(symbols):
         symbols_indexes[symbol['Name']] = str(index)
-
+        idxSymbolRedux[str(index)] = symbol['Name']
     for fta in fitaSaida:
         if fta == 'S1':
             fta = 'VAR'
@@ -289,11 +291,45 @@ def mapeamento(symbols):
             fta = 'NUM'
         elif fta == '$':
             fta = 'EOF'
-
         fita.append(symbols_indexes[fta])
+
+    for line in tS:
+        if line['State'] == 'S1':
+            line['State'] = 'VAR'
+        elif line['State'] == 'S2':
+            line['State'] = 'NUM'
+        elif line['State'] == '$':
+            line['State'] = 'EOF'
 
 
 def analisador_sintatico():
+    reduxSymbol, symbols, productions, lalr_table, idBloco = [], [], [], [], []
+
+    def charge():
+        xml_symbols = root.iter('Symbol')
+        for symbol in xml_symbols:
+            symbols.append({
+                'Index': symbol.attrib['Index'],
+                'Name': symbol.attrib['Name'],
+                'Type': symbol.attrib['Type']
+            })
+
+        xml_productions = root.iter('Production')
+        for production in xml_productions:
+            productions.append({
+                'NonTerminalIndex': production.attrib['NonTerminalIndex'],
+                'SymbolCount': int(production.attrib['SymbolCount']),
+            })
+
+        lalr_states = root.iter('LALRState')
+        for state in lalr_states:
+            lalr_table.append({})
+            for action in state:
+                lalr_table[int(state.attrib['Index'])][str(action.attrib['SymbolIndex'])] = {
+                    'Action': action.attrib['Action'],
+                    'Value': action.attrib['Value']
+                }
+
     def parser():
         idx = 0
         while True:
@@ -313,7 +349,7 @@ def analisador_sintatico():
                 while size:
                     state.pop(0)
                     size -= 1
-                # salto
+                reduxSymbol.append(productions[int(action['Value'])]['NonTerminalIndex'])
                 state.insert(0, productions[int(action['Value'])]['NonTerminalIndex'])
                 state.insert(0, lalr_table[int(state[1])][state[0]]['Value'])
             elif action['Action'] == '3':
@@ -322,41 +358,44 @@ def analisador_sintatico():
                 print('Código aceito')
                 break
 
-        # print(action)
-        # print(state)
-        # print(fita)
+    def catchStatements():
+        fifo, escopo = ['Global'], []
+        reduxSymbol.reverse()
+#        for x in reduxSymbol:
+#            print(x, idxSymbolRedux[x])
+        for symbol in reduxSymbol:
+            if idxSymbolRedux[symbol] == 'REP' or idxSymbolRedux[symbol] == 'COND':
+                fifo.insert(0, idxSymbolRedux[symbol])
+            elif idxSymbolRedux[symbol] == 'CONDS':
+                fifo.pop(0)
+            elif idxSymbolRedux[symbol] == 'DEC':
+                escopo.append(fifo[0])
+        escopo.reverse()
+        for line in tS:
+        #    print(line)
+            if line['State'] == 'ENQUANTO' or line['State'] == 'SE':
+                idBloco.append(line['Id'])
+#        print(idBloco)
+        print(escopo)
 
-    symbols = []
-    productions = []
-    lalr_table = []
+    def completeTS():
+#        print(escopo)
+        for line in range(len(tS)):
+            if tS[line]['State'] == 'BIN' and tS[line+1]['State'] == 'VAR':
+                tS[line]['Escopo'] = idBloco[0]
+                idBloco.pop(0)
+#        for line in tS:
+#            print(line)
+        
 
-    xml_symbols = root.iter('Symbol')
-    for symbol in xml_symbols:
-        symbols.append({
-            'Index': symbol.attrib['Index'],
-            'Name': symbol.attrib['Name'],
-            'Type': symbol.attrib['Type']
-        })
-
-    xml_productions = root.iter('Production')
-    for production in xml_productions:
-        productions.append({
-            'NonTerminalIndex': production.attrib['NonTerminalIndex'],
-            'SymbolCount': int(production.attrib['SymbolCount']),
-        })
-
-    lalr_states = root.iter('LALRState')
-    for state in lalr_states:
-        lalr_table.append({})
-        for action in state:
-            lalr_table[int(state.attrib['Index'])][str(action.attrib['SymbolIndex'])] = {
-                'Action': action.attrib['Action'],
-                'Value': action.attrib['Value']
-            }
 
     state = ['0']
+    charge()
     mapeamento(symbols)
     parser()
+    catchStatements()
+#    completeTS()
+
     
 
 def main():
