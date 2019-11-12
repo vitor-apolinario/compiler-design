@@ -225,10 +225,10 @@ def analisador_lexico():
             if char in operadores and string:                                 # Se lemos um operador e temos uma string não vazia
                 if string[-1] not in operadores:                              # Se o ultimo caractere reconhecido não é um operador:
                     if E in finais:                                           # O operador lido atualmente é um separador
-                        tS.append({'Line': idx, 'State': E, 'Label': string, 'Id': id}) # Logo devemos reconhecer a string anterior e continuar a leitura
+                        tS.append({'Line': idx, 'State': E, 'Label': string}) # Logo devemos reconhecer a string anterior e continuar a leitura
                         fitaSaida.append(E)
                     else:
-                        tS.append({'Line': idx, 'State': 'Error', 'Label': string, 'Id': id})
+                        tS.append({'Line': idx, 'State': 'Error', 'Label': string})
                         fitaSaida.append('Error')
                     E = tabela['S'][char][0]                                    # É iniciado o mapeamento da próxima estrutura de operadores
                     string = char
@@ -241,10 +241,10 @@ def analisador_lexico():
                         E = tabela[E][char][0]
             elif char in separadores and string:
                 if E in finais:
-                    tS.append({'Line': idx, 'State': E, 'Label': string, 'Id': id})
+                    tS.append({'Line': idx, 'State': E, 'Label': string})
                     fitaSaida.append(E)
                 else:
-                    tS.append({'Line': idx, 'State': 'Error', 'Label': string, 'Id': id})
+                    tS.append({'Line': idx, 'State': 'Error', 'Label': string})
                     fitaSaida.append('Error')
                 E = 'S'
                 string = ''
@@ -255,10 +255,10 @@ def analisador_lexico():
                 if char not in separadores and char not in operadores and string:
                     if string[-1] in operadores:
                         if E in finais:                                             # O operador lido atualmente é um separador
-                            tS.append({'Line': idx, 'State': E, 'Label': string, 'Id': id})
+                            tS.append({'Line': idx, 'State': E, 'Label': string})
                             fitaSaida.append(E)
                         else:
-                            tS.append({'Line': idx, 'State': 'Error', 'Label': string, 'Id': id})
+                            tS.append({'Line': idx, 'State': 'Error', 'Label': string})
                             fitaSaida.append('Error')
                         E = 'S'
                         string = ''
@@ -268,7 +268,7 @@ def analisador_lexico():
                     E = '€'
                 else:
                     E = tabela[E][char][0]
-    tS.append({'Line': idx, 'State': 'EOF', 'Label': '', 'Id': id})
+    tS.append({'Line': idx, 'State': 'EOF', 'Label': ''})
     fitaSaida.append('EOF')
     erro = False
     for linha in tS:
@@ -303,7 +303,7 @@ def mapeamento(symbols):
 
 
 def analisador_sintatico():
-    reduxSymbol, symbols, productions, lalr_table, idBloco = [], [], [], [], []
+    reduxSymbol, symbols, productions, lalr_table, escopo, block = [], [], [], [], [], []
 
     def charge():
         xml_symbols = root.iter('Symbol')
@@ -359,34 +359,33 @@ def analisador_sintatico():
                 break
 
     def catchStatements():
-        fifo, escopo = ['Global'], []
-        reduxSymbol.reverse()
-#        for x in reduxSymbol:
-#            print(x, idxSymbolRedux[x])
+        fifo = [1]
+        id = 1
         for symbol in reduxSymbol:
-            if idxSymbolRedux[symbol] == 'REP' or idxSymbolRedux[symbol] == 'COND':
-                fifo.insert(0, idxSymbolRedux[symbol])
-            elif idxSymbolRedux[symbol] == 'CONDS':
+            print(idxSymbolRedux[symbol])
+            if idxSymbolRedux[symbol] == 'CONDS':
+                id += 1
+                fifo.insert(0, id)
+                block.append(fifo[1])
+            elif idxSymbolRedux[symbol] == 'REP' or idxSymbolRedux[symbol] == 'COND':
                 fifo.pop(0)
             elif idxSymbolRedux[symbol] == 'DEC':
-                escopo.append(fifo[0])
-        escopo.reverse()
-        for line in tS:
-        #    print(line)
-            if line['State'] == 'ENQUANTO' or line['State'] == 'SE':
-                idBloco.append(line['Id'])
-#        print(idBloco)
-        print(escopo)
+                escopo.append(fifo[0]) 
 
     def completeTS():
-#        print(escopo)
-        for line in range(len(tS)):
-            if tS[line]['State'] == 'BIN' and tS[line+1]['State'] == 'VAR':
-                tS[line]['Escopo'] = idBloco[0]
-                idBloco.pop(0)
-#        for line in tS:
-#            print(line)
-        
+        ok = False
+        print('Dec: ', escopo)
+        print('Block: ', block)
+        for token in tS:
+            #print(token)
+            if token['State'] == 'BIN':
+                ok = True
+                continue
+            if token['State'] == 'VAR' and ok:
+                token['Scope'] = escopo.pop(0)
+                ok = False
+        for token in tS:
+            print(token)
 
 
     state = ['0']
@@ -394,7 +393,7 @@ def analisador_sintatico():
     mapeamento(symbols)
     parser()
     catchStatements()
-#    completeTS()
+    completeTS()
 
     
 
