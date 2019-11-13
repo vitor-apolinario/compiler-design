@@ -1,11 +1,11 @@
 // use o plugin bnf do vscode para melhor visualizar
-// "Start Symbol" = <S>
+"Start Symbol" = <S>
 <S> ::= <DEC> '.' <A> | <ATR> '.' <A> | <REP> <A> | <COND> <A>
 <A> ::= <DEC> '.' <A> | <ATR> '.' <A> | <REP> <A> | <COND> <A> | <>
-<DEC> ::= BIN <VAR> | BIN <VAR> '~' NUM
-<ATR> ::= <VAR> '~' NUM
+<RVAR> ::= VAR
+<DEC> ::= BIN <RVAR> | BIN <RVAR> '~' NUM
+<ATR> ::= <RVAR> '~' NUM
+<OP> ::= IGUAL | MAIOR | MENOR
 <COND> ::= SE <CONDS> '{' <S> '}'
 <REP> ::= ENQUANTO <CONDS> '{' <S> '}'
-<CONDS> ::= <VAR> | <VAR> <OP> <VAR> | <VAR> <OP> NUM | NUM <OP> <VAR> | NUM <OP> NUM
-<OP> ::= IGUAL | MAIOR | MENOR
-<VAR> ::= VAR
+<CONDS> ::= <RVAR> | <RVAR> <OP> <RVAR> | <RVAR> <OP> NUM | NUM <OP> <RVAR> | NUM <OP> NUM
