@@ -15,12 +15,12 @@ def eliminar_mortos():
     for x in tabela:
         if x not in vivos and x != '€':
             mortos.append(x)
-    
+
     for x in mortos:
         del tabela[x]
 
 
-def buscar_vivos():    
+def buscar_vivos():
     mudou = False
 
     for regra in tabela:
@@ -39,10 +39,10 @@ def eliminar_incal():
     for regra in loop:
         if regra not in alcan:
             del tabela[regra]
-                
+
 
 def buscar_alcan(estado):
-    if estado not in alcan:         
+    if estado not in alcan:
         alcan.append(estado)
         for simbolo in tabela[estado]:
             if tabela[estado][simbolo] \
@@ -115,7 +115,7 @@ def determizinar():
                 tabela[regra][producao] = novo.split()
     if novosestados:
         criar_novos(novosestados)
-    
+
 
 def criar_af():
     for x in gramatica:
@@ -172,7 +172,7 @@ def tratar_token(token):
 
         if len(token) == 1:
             iniregra = '<' + cp_token.upper() + '>'
-            gramatica['S'] += str(token[x] + iniregra).split()            
+            gramatica['S'] += str(token[x] + iniregra).split()
             gramatica[cp_token.upper()] = []
             finais.append(cp_token.upper())
         elif x == 0 and x != len(token)-1:
@@ -362,28 +362,21 @@ def analisador_sintatico():
         fifo = [1]
         id = 1
         for symbol in reduxSymbol:
-            print(idxSymbolRedux[symbol])
             if idxSymbolRedux[symbol] == 'CONDS':
                 id += 1
                 fifo.insert(0, id)
                 block.append(fifo[1])
             elif idxSymbolRedux[symbol] == 'REP' or idxSymbolRedux[symbol] == 'COND':
                 fifo.pop(0)
-            elif idxSymbolRedux[symbol] == 'DEC':
-                escopo.append(fifo[0]) 
+            elif idxSymbolRedux[symbol] == 'RVAR':
+                escopo.append(fifo[0])
 
     def completeTS():
-        ok = False
         print('Dec: ', escopo)
         print('Block: ', block)
         for token in tS:
-            #print(token)
-            if token['State'] == 'BIN':
-                ok = True
-                continue
-            if token['State'] == 'VAR' and ok:
+            if token['State'] == 'VAR':
                 token['Scope'] = escopo.pop(0)
-                ok = False
         for token in tS:
             print(token)
 
@@ -395,7 +388,7 @@ def analisador_sintatico():
     catchStatements()
     completeTS()
 
-    
+
 
 def main():
     gramatica['S'] = []
@@ -421,7 +414,7 @@ def main():
     analisador_sintatico()
     # print('OldFita: ', fitaSaida)
     # print('\nNewFita: ', fita)
-    
+
 
 print('\n' * 45)
 main()
