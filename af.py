@@ -355,7 +355,6 @@ def analisador_sintatico():
             elif action['Action'] == '3':
                 print('salto')
             elif action['Action'] == '4':
-                print('Código aceito')
                 break
 
     def catchStatements():
@@ -372,14 +371,9 @@ def analisador_sintatico():
                 escopo.append(fifo[0])
 
     def completeTS():
-        print('Dec: ', escopo)
-        print('Block: ', block)
         for token in tS:
             if token['State'] == 'VAR':
                 token['Scope'] = escopo.pop(0)
-        for token in tS:
-            print(token)
-        print('\n\n\n\n')
 
     state = ['0']
     charge()
@@ -389,7 +383,7 @@ def analisador_sintatico():
     completeTS()
 
 def analisador_semantico():
-    variaveis = []
+    variaveis = {}
 
     def checkScope(scopeUse, scopeDec):
         if scopeUse == 0:
@@ -401,23 +395,16 @@ def analisador_semantico():
 
     for it in range(len(tS)):
         if tS[it]['State'] == 'VAR' and tS[it-1]['State'] == 'BIN':
-            variaveis.append({
-                'Label': tS[it]['Label'],
-                'Scope': tS[it]['Scope']
-            })
-#            print('Declaração: ', tS[it])
-        if tS[it]['State'] == 'VAR' and not tS[it-1]['State'] == 'BIN':
-            flag = True
-            print('Utilização: ', tS[it])
-            for var in variaveis:
-                # Verificar se o escopo é permitido
-                if tS[it]['Label'] in var['Label']:
-                    flag = False
-                    if not checkScope(tS[it]['Scope'], var['Scope']):
-                        print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(tS[it]['Line']+1, tS[it]['Label']))
+            variaveis[tS[it]['Label']] = tS[it]['Scope']
 
+        if tS[it]['State'] == 'VAR' and not tS[it-1]['State'] == 'BIN':
+            if tS[it]['Label'] in variaveis:
+                flag = False
+                # Verificar se o escopo é permitido
+                if not checkScope(tS[it]['Scope'], variaveis[tS[it]['Label']]):
+                    print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(tS[it]['Line']+1, tS[it]['Label']))
             # Verificar se a variável já foi inicializada
-            if flag:
+            else:
                 print('Erro semântico: linha {}, variável "{}" ainda não inicializada!'.format(tS[it]['Line']+1, tS[it]['Label']))
 
 def main():
