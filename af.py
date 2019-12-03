@@ -6,7 +6,7 @@ codigo  = list(open('config/codigo.txt'))
 tree = ET.parse('config/tabParsing.xml')
 root = tree.getroot()
 
-simbolos, estados, alcan, finais, vivos, tS, fitaSaida, fita = [], [], [], [], [], [], [], []
+simbolos, estados, alcan, finais, vivos, tS, fitaSaida, fita, escopo, block = [], [], [], [], [], [], [], [], [], [0]
 gramatica, tabela, epTransicao, idxSymbolRedux = {}, {}, {}, {}
 repeticao = 0
 
@@ -303,7 +303,7 @@ def mapeamento(symbols):
 
 
 def analisador_sintatico():
-    reduxSymbol, symbols, productions, lalr_table, escopo, block = [], [], [], [], [], []
+    reduxSymbol, symbols, productions, lalr_table = [], [], [], []
 
     def charge():
         xml_symbols = root.iter('Symbol')
@@ -390,23 +390,35 @@ def analisador_sintatico():
 
 def analisador_semantico():
     variaveis = []
+
+    def checkScope(scopeUse, scopeDec):
+        if scopeUse == 0:
+            return False
+        if scopeUse == scopeDec:
+            return True
+        else:
+            checkScope(block[scopeUse]-1, scopeDec)
+
     for it in range(len(tS)):
         if tS[it]['State'] == 'VAR' and tS[it-1]['State'] == 'BIN':
             variaveis.append({
                 'Label': tS[it]['Label'],
                 'Scope': tS[it]['Scope']
             })
-            print('Declaração: ', tS[it])
+#            print('Declaração: ', tS[it])
         if tS[it]['State'] == 'VAR' and not tS[it-1]['State'] == 'BIN':
             flag = True
-
+            print('Utilização: ', tS[it])
             for var in variaveis:
                 # Verificar se o escopo é permitido
                 if tS[it]['Label'] in var['Label']:
                     flag = False
+                    if not checkScope(tS[it]['Scope'], var['Scope']):
+                        print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(tS[it]['Line']+1, tS[it]['Label']))
+
             # Verificar se a variável já foi inicializada
             if flag:
-                print('Erro de resquem: ', tS[it])
+                print('Erro semântico: linha {}, variável "{}" ainda não inicializada!'.format(tS[it]['Line']+1, tS[it]['Label']))
 
 def main():
     gramatica['S'] = []
