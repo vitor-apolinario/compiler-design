@@ -1,6 +1,6 @@
 bin a.
 bin ae ~ 0.
-ia ~ 0.
+i ~ 0.
 se ae menor 1 {
     bin aei ~ 10.
 }

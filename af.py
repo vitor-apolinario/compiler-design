@@ -285,7 +285,7 @@ def mapeamento(symbols):
         symbols_indexes[symbol['Name']] = str(index)
         idxSymbolRedux[str(index)] = symbol['Name']
     for fta in fitaSaida:
-        if fta == 'S1':
+        if fta == 'S1' or fta == 'ENQUANTO1:S1' or fta == 'IGUAL1:S1':
             fta = 'VAR'
         elif fta == 'S2':
             fta = 'NUM'
@@ -294,7 +294,7 @@ def mapeamento(symbols):
         fita.append(symbols_indexes[fta])
 
     for line in tS:
-        if line['State'] == 'S1':
+        if line['State'] == 'S1' or line['State'] == 'ENQUANTO1:S1' or line['State'] == 'IGUAL1:S1':
             line['State'] = 'VAR'
         elif line['State'] == 'S2':
             line['State'] = 'NUM'
