@@ -379,7 +379,7 @@ def analisador_sintatico():
                 token['Scope'] = escopo.pop(0)
         for token in tS:
             print(token)
-
+        print('\n\n\n\n')
 
     state = ['0']
     charge()
@@ -388,7 +388,25 @@ def analisador_sintatico():
     catchStatements()
     completeTS()
 
+def analisador_semantico():
+    variaveis = []
+    for it in range(len(tS)):
+        if tS[it]['State'] == 'VAR' and tS[it-1]['State'] == 'BIN':
+            variaveis.append({
+                'Label': tS[it]['Label'],
+                'Scope': tS[it]['Scope']
+            })
+            print('Declaração: ', tS[it])
+        if tS[it]['State'] == 'VAR' and not tS[it-1]['State'] == 'BIN':
+            flag = True
 
+            for var in variaveis:
+                # Verificar se o escopo é permitido
+                if tS[it]['Label'] in var['Label']:
+                    flag = False
+            # Verificar se a variável já foi inicializada
+            if flag:
+                print('Erro de resquem: ', tS[it])
 
 def main():
     gramatica['S'] = []
@@ -412,6 +430,7 @@ def main():
     criar_csv()
     analisador_lexico()
     analisador_sintatico()
+    analisador_semantico()
     # print('OldFita: ', fitaSaida)
     # print('\nNewFita: ', fita)
 
