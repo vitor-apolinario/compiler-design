@@ -10,6 +10,7 @@ simbolos, estados, alcan, finais, vivos, tS, fitaSaida, fita, escopo, block = []
 gramatica, tabela, epTransicao, idxSymbolRedux = {}, {}, {}, {}
 repeticao = 0
 
+
 def eliminar_mortos():
     mortos = []
     for x in tabela:
@@ -277,6 +278,8 @@ def analisador_lexico():
             print('Erro léxico: linha {}, sentença "{}" não reconhecida!'.format(linha['Line']+1, linha['Label']))
     if erro:
         exit()
+
+
 # Função que inicialmente troca na fitaSaida os estados S1 e S2 por VAR e NUM, respectivamente
 # Por fim, altera o estados que eram nomes pelo indice para ser reconhecido no analisador sintático
 def mapeamento(symbols):
@@ -303,7 +306,7 @@ def mapeamento(symbols):
 
 
 def analisador_sintatico():
-    reduxSymbol, symbols, productions, lalr_table = [], [], [], []
+    redux_symbol, symbols, productions, lalr_table = [], [], [], []
 
     def charge():
         xml_symbols = root.iter('Symbol')
@@ -349,7 +352,7 @@ def analisador_sintatico():
                 while size:
                     state.pop(0)
                     size -= 1
-                reduxSymbol.append(productions[int(action['Value'])]['NonTerminalIndex'])
+                redux_symbol.append(productions[int(action['Value'])]['NonTerminalIndex'])
                 state.insert(0, productions[int(action['Value'])]['NonTerminalIndex'])
                 state.insert(0, lalr_table[int(state[1])][state[0]]['Value'])
             elif action['Action'] == '3':
@@ -357,10 +360,10 @@ def analisador_sintatico():
             elif action['Action'] == '4':
                 break
 
-    def catchStatements():
+    def catch_statements():
         fifo = [1]
         id = 1
-        for symbol in reduxSymbol:
+        for symbol in redux_symbol:
             if idxSymbolRedux[symbol] == 'CONDS':
                 id += 1
                 fifo.insert(0, id)
@@ -370,7 +373,7 @@ def analisador_sintatico():
             elif idxSymbolRedux[symbol] == 'RVAR':
                 escopo.append(fifo[0])
 
-    def completeTS():
+    def complete_ts():
         for token in tS:
             if token['State'] == 'VAR':
                 token['Scope'] = escopo.pop(0)
@@ -379,19 +382,20 @@ def analisador_sintatico():
     charge()
     mapeamento(symbols)
     parser()
-    catchStatements()
-    completeTS()
+    catch_statements()
+    complete_ts()
+
 
 def analisador_semantico():
     variaveis = {}
 
-    def checkScope(scopeUse, scopeDec):
-        if scopeUse == 0:
+    def check_scope(scope_use, scope_dec):
+        if scope_use == 0:
             return False
-        if scopeUse == scopeDec:
+        if scope_use == scope_dec:
             return True
         else:
-            checkScope(block[scopeUse]-1, scopeDec)
+            check_scope(block[scope_use] - 1, scope_dec)
 
     for it in range(len(tS)):
         if tS[it]['State'] == 'VAR' and tS[it-1]['State'] == 'BIN':
@@ -401,11 +405,12 @@ def analisador_semantico():
             if tS[it]['Label'] in variaveis:
                 flag = False
                 # Verificar se o escopo é permitido
-                if not checkScope(tS[it]['Scope'], variaveis[tS[it]['Label']]):
+                if not check_scope(tS[it]['Scope'], variaveis[tS[it]['Label']]):
                     print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(tS[it]['Line']+1, tS[it]['Label']))
             # Verificar se a variável já foi inicializada
             else:
                 print('Erro semântico: linha {}, variável "{}" ainda não inicializada!'.format(tS[it]['Line']+1, tS[it]['Label']))
+
 
 def main():
     gramatica['S'] = []
