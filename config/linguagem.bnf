@@ -1,9 +1,10 @@
-// use o plugin bnf do vscode para melhor visualizar
 "Start Symbol" = <S>
 <S> ::= <DEC> '.' <A> | <ATR> '.' <A> | <REP> <A> | <COND> <A>
 <A> ::= <DEC> '.' <A> | <ATR> '.' <A> | <REP> <A> | <COND> <A> | <>
 <RVAR> ::= VAR
-<DEC> ::= BIN <RVAR> | BIN <RVAR> '~' NUM
+<DEC> ::= BIN <RVAR> | BIN <RVAR> '~' <MAT>
+<MAT> ::= <RVAR> | NUM | <RVAR> <FUN> <RVAR> | <RVAR> <FUN> NUM | NUM <FUN> <RVAR> | NUM <FUN> NUM
+<FUN> ::= '+' | '-' | '*' | '/'
 <ATR> ::= <RVAR> '~' NUM
 <OP> ::= IGUAL | MAIOR | MENOR
 <COND> ::= SE <CONDS> '{' <S> '}'
