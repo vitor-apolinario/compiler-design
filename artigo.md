@@ -61,3 +61,25 @@ O autômato finito determinístico implementado no componente curricular Linguag
 ### Código escrito pelo programador
 
 No arquivo "codigo.txt" pode ser descrito qualquer símbolo e estrutura que o programador queira, esse código será realizado as análises e otimizações, se nenhum erro for encontrado o código será aceito. Caso seja encontrado um erro será em alguma etapa de análise que explicaremos a seguir.
+
+### Análise léxica
+
+Seu funcionamento é percorrer cada caracter do arquivo "codigo.txt" e verificar se eles ou sequência deles é permitida pela linguagem. Ao ler cada caracter será associado o que deve ser feito com ele seguindo as possibilidades abaixo:
+
+- Se o caracter for um operador separador: é adicionado na tabela de símbolos e fita de saída a cadeia de símbolos antecessora e reiniciado a analise já com o caracter lido.
+
+- Se o caracter for operador mas não separador: será continuada a leitura dos caracteres.
+
+- Se o caracter for um separador e suceder uma cadeia de símbolos: a cadeia em questão é adicionada a tabela de símbolos e fita de saída e a análise é reiniciada sem nenhum caracter.
+
+- Caso encontre o fim de um operador: o mesmo é adicionado à fita de saída e tabela de símbolos e reinicia o processo.
+
+- Caso o caracter não seja nenhum dos descritos acima é lido o próximo caracter.
+
+Quando chegar no fim do arquivo é adicionado o estado final na fita de saída e tabela de símbolos.  
+Por fim, toda a tabela de símbolos é percorrida em busca de tokens com estado de erro, se encontrado uma mensagem de erro é exibida na tela contendo a linha e o próprio token.  
+Duas estruturas são retornadas da análise léxica:
+
+- Tabela de símbolos contendo linha, estado e rótulo para cada token.
+
+- Fita de saída, vetor que armazena somente os estados dos tokens que será usada na analíse sintática.
