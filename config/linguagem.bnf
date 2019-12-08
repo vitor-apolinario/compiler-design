@@ -1,12 +1,12 @@
 "Start Symbol" = <S>
 <S> ::= <DEC> '.' <A> | <ATR> '.' <A> | <REP> <A> | <COND> <A>
 <A> ::= <DEC> '.' <A> | <ATR> '.' <A> | <REP> <A> | <COND> <A> | <>
-<RVAR> ::= VAR
-<DEC> ::= BIN <RVAR> | BIN <RVAR> '~' <MAT>
-<MAT> ::= <RVAR> | NUM | <RVAR> <FUN> <RVAR> | <RVAR> <FUN> NUM | NUM <FUN> <RVAR> | NUM <FUN> NUM
+<DEC> ::= BIN <RVAR> | BIN <RVAR> '~' NUM
+<ATR> ::= <RVAR> '~' NUM <MAT> | <RVAR> '~' <RVAR> <MAT>
+<MAT> ::= <FUN> <RVAR> <MAT> | <FUN> NUM <MAT> | <>
 <FUN> ::= '+' | '-' | '*' | '/'
-<ATR> ::= <RVAR> '~' NUM
-<OP> ::= IGUAL | MAIOR | MENOR
 <COND> ::= SE <CONDS> '{' <S> '}'
 <REP> ::= ENQUANTO <CONDS> '{' <S> '}'
 <CONDS> ::= <RVAR> | <RVAR> <OP> <RVAR> | <RVAR> <OP> NUM | NUM <OP> <RVAR> | NUM <OP> NUM
+<OP> ::= IGUAL | MAIOR | MENOR
+<RVAR> ::= VAR
