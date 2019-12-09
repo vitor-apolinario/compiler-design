@@ -4,7 +4,7 @@
 <DEC> ::= BIN <RVAR> | BIN <RVAR> '~' NUM
 <ATR> ::= <RVAR> '~' NUM <MAT> | <RVAR> '~' <RVAR> <MAT>
 <MAT> ::= <FUN> <RVAR> <MAT> | <FUN> NUM <MAT> | <>
-<FUN> ::= '+' | '-' | '*' | '/'
+<FUN> ::= '+' | '-' | '\' | '/'
 <COND> ::= SE <CONDS> '{' <S> '}'
 <REP> ::= ENQUANTO <CONDS> '{' <S> '}'
 <CONDS> ::= <RVAR> | <RVAR> <OP> <RVAR> | <RVAR> <OP> NUM | NUM <OP> <RVAR> | NUM <OP> NUM
