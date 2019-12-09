@@ -388,7 +388,7 @@ def analisador_sintatico():
 
 
 def analisador_semantico():
-    variaveis = {}
+    var_scope = {}
     error = False
 
     def check_scope(scope_use, scope_dec):
@@ -399,20 +399,20 @@ def analisador_semantico():
         else:
             check_scope(block[scope_use] - 1, scope_dec)
 
-    for it in range(len(tS)):
-        if tS[it]['State'] == 'VAR' and tS[it-1]['State'] == 'BIN':
-            variaveis[tS[it]['Label']] = tS[it]['Scope']
+    for index, token in enumerate(tS):
+        if token['State'] == 'VAR' and tS[index-1]['State'] == 'BIN':
+            var_scope[token['Label']] = token['Scope']
 
-        if tS[it]['State'] == 'VAR' and not tS[it-1]['State'] == 'BIN':
-            if tS[it]['Label'] in variaveis:
+        if token['State'] == 'VAR' and tS[index-1]['State'] != 'BIN':
+            if token['Label'] in var_scope:
                 # Verificar se o escopo é permitido
-                if not check_scope(tS[it]['Scope'], variaveis[tS[it]['Label']]):
+                if not check_scope(token['Scope'], var_scope[token['Label']]):
                     error = True
-                    print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(tS[it]['Line']+1, tS[it]['Label']))
+                    print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(token['Line']+1, token['Label']))
             # Verificar se a variável já foi inicializada
             else:
                 error = True
-                print('Erro semântico: linha {}, variável "{}" ainda não inicializada!'.format(tS[it]['Line']+1, tS[it]['Label']))
+                print('Erro semântico: linha {}, variável "{}" não declarada!'.format(token['Line']+1, token['Label']))
     if error:
         exit()
 
