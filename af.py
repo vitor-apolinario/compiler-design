@@ -341,6 +341,7 @@ def analisador_sintatico():
                 action = lalr_table[int(state[0])][ultimo_fita]
             except:
                 print('Erro sintático: linha {}, sentença "{}" não reconhecida!'.format(tS[idx]['Line']+1, tS[idx]['Label']))
+                exit()
                 break
 
             if action['Action'] == '1':
@@ -388,6 +389,7 @@ def analisador_sintatico():
 
 def analisador_semantico():
     variaveis = {}
+    error = False
 
     def check_scope(scope_use, scope_dec):
         if scope_use == 0:
@@ -403,14 +405,16 @@ def analisador_semantico():
 
         if tS[it]['State'] == 'VAR' and not tS[it-1]['State'] == 'BIN':
             if tS[it]['Label'] in variaveis:
-                flag = False
                 # Verificar se o escopo é permitido
                 if not check_scope(tS[it]['Scope'], variaveis[tS[it]['Label']]):
+                    error = True
                     print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(tS[it]['Line']+1, tS[it]['Label']))
             # Verificar se a variável já foi inicializada
             else:
+                error = True
                 print('Erro semântico: linha {}, variável "{}" ainda não inicializada!'.format(tS[it]['Line']+1, tS[it]['Label']))
-
+    if error:
+        exit()
 
 def main():
     gramatica['S'] = []
