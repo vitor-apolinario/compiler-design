@@ -83,3 +83,51 @@ Duas estruturas são retornadas da análise léxica:
 - Tabela de símbolos contendo linha, estado e rótulo para cada token.
 
 - Fita de saída, vetor que armazena somente os estados dos tokens que será usada na analíse sintática.
+
+### Análise sintática
+
+Recebe como entrada a fita de saída obtida na etapa anterior. Tem objetivo principal de reconhecer se a estrutura sintática do código escrito pelo programador obedece as regras de produção especificadas pela gramática livre de contexto. Através da identificação das reduções consegue armazenar informações em uma estrutura auxiliar e posteriormente define o escopo de uso dos tokens, informações essas necessárias para validações da análise semântica.
+
+- Inicialmente carrega algumas informações apartir do xml gerado pelo GoldParser:
+  - Informações dos símbolos (estrutura utilizada pelo analisador):
+  
+   ```   
+   symbols = [
+     {
+      'Index': '12',
+      'Name': 'ENQUANTO',
+      'Type': '1'
+     }, 
+     ...
+   ]
+   ```
+
+  - Informações das produções (estrutura utilizada pelo analisador):
+  
+   ```   
+   productions = [
+     {
+      'NonTerminalIndex': '29
+      'SymbolCount': 3
+     }, 
+     ...
+   ]
+   ```
+   
+  - A tabela LALR (estrutura utilizada pelo analisador):
+  
+  obs.: As ações podem ser 1, 2, 3 e 4, respectivamente empilhamento, redução, salto e aceite.
+   ```   
+   lalr_table = [
+     {
+      // índice do símbolo produzido
+      '11': {
+        // ação à ser realizada
+        'Action': '1'
+        'Value': '1'
+      },
+      ...      
+     }, 
+     ...
+   ]
+   ```
