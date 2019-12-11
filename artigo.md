@@ -206,7 +206,36 @@ ESCOPO1 (global)
     ESCOPO4
 ```
 O vetor gerado será o seguinte \[0, 1, 1, 3], e significa que o escopo 1 (global) é a raíz, o escopo 2, é filho do escopo 1, o escopo 3 é filho do escopo 1, e o escopo 4 é filho do escopo 3. Esta "árvore de escopos" será utilizada posteriormente na análise semântica.
-Assim como na identificação do início e final de escopos, foi criada uma regra na linguagem que sempre realiza uma redução quando encontra uma uma váriável, assim quando estamos montando a árvore de escopos e encontramos uma redução do tipo RVAR ::= VAR, sabemos que há o uso ou declaração de uma variável, assim devemos atribuír o escopo atual para o token encontrado.
+Assim como na identificação do início e final de escopos, foi criada uma regra na linguagem que sempre realiza uma redução quando encontra uma uma váriável, assim quando estamos montando a árvore de escopos e encontramos uma redução do tipo RVAR ::= VAR, sabemos que há o uso ou declaração de uma variável, assim devemos atribuír o escopo atual para o token encontrado. Desta forma qualquer token que seja uma variável vai ter um atributo denominado 'Scope' que informa o escopo no qual o mesmo está sendo utilizado.
 
 
+### Análise semântica
 
+Como características semânticas da nossa linguagem, resolvemos tratar o escopo de declaração e uso de variáveis não declaradas. 
+- Uma variável declarada num escopo X, só é acessível em X ou em escopos filhos de X;
+- Somente variáveis declaradas podem ser utilizadas. 
+
+Resultado da análise sintática, temos duas estruturas, a "árvore de escopos", e o escopo de declaração das variáveis. Assim precisamos percorrer a tabela de símbolos, e pra cada utilização de uma variável (somente uso), verificamos inicialmente se aquela variável foi consta na estrutura de declaração das variáveis:
+- Se não consta: Erro semântico de variável não declarada;
+- Se consta: Devemos verificar se o escopo de uso é válido?
+    - A verificação do escopo ocorre utilizando a árvore e um algoritmo recursivo, suponha o seguinte exemplo:
+    ```
+    ESCOPO1 (global)
+      declaração var a
+      ESCOPO2
+      ESCOPO3
+        ESCOPO4
+        uso var a
+    ```
+    A árvore criada seria \[0, 1, 1, 3], a variável "a" foi declarada no escopo 1, e usada no escopo 4, este uso é permitido? chama-se a função recursiva verifica_escopo(4, 1).
+```
+verifica_escopo(escopo_uso, escopo_declarado)
+    if escopo_uso == 0:
+        uso válido
+    if escopo_uso == escopo_declarado:
+        uso inválido
+    else:
+        verifica_escopo(arvore[escopo_uso] - 1, escopo_declarado)
+```
+    
+    
