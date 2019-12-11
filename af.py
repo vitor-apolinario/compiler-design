@@ -418,7 +418,7 @@ def analisador_semantico():
 
 def codigo_intermediario():
     ts_code = []
-#    int_code = []
+    int_code = []
     def encontra_operacoes():
         flag = False
         operacao = []
@@ -434,8 +434,64 @@ def codigo_intermediario():
                 operacao.append(token['Label'])
 
 
+    def gera_temp(operacao, temp):
+        cod = []
+        for x in range(1, 4):
+            cod.insert(0, operacao[-1])
+            operacao.pop(-1)
+
+        cod.insert(0, '~')
+        cod.insert(0, 'T'+str(temp))
+        operacao.append('T' + str(temp))
+        return operacao, cod
+
+    def gera_codigo():
+        temp = 1
+        for operacao in ts_code:
+            while True:
+
+                if len(operacao) == 3:
+                    cod = []
+                    for x in range(len(operacao)):
+                        cod.append(operacao[x])
+
+                    int_code.append(cod)
+                    break
+
+                operacao, cod = gera_temp(operacao, temp)
+                temp += 1
+                int_code.append(cod)
+
+        print('---Código Intermediário---')
+        for x in int_code:
+            print(x)
+
+
     encontra_operacoes()
-#    gera_codigo()
+    gera_codigo()
+'''
+            while len(funcao) > 2:
+                for fun in funcao:
+                    if it == 2:
+                        E.insert(0, fun)
+                        E.insert(0, '~')
+                        E.insert(0, 'T'+str(temp))
+                        funcao.pop(-1)
+                        funcao.append('T'+str(temp))
+
+                        cod.append(E)
+                        E = []
+                        it = 0
+                        temp += 1
+                    else:
+                        E.insert(0, fun)
+                        funcao.pop(-1)
+                        it += 1
+            print('E: ', E)
+        for x in cod:
+            print('Cod: ', x)
+'''
+
 
 def main():
     gramatica['S'] = []
