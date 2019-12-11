@@ -416,6 +416,27 @@ def analisador_semantico():
     if error:
         exit()
 
+def codigo_intermediario():
+    ts_code = []
+#    int_code = []
+    def encontra_operacoes():
+        flag = False
+        operacao = []
+        for idx, token in enumerate(tS):
+            if token['State'] == 'VAR' and tS[idx+1]['State'] == '~' and tS[idx+1]['State'] != '.':
+                operacao.append(token['Label'])
+                flag = True
+            elif token['State'] == '.' and tS[idx-2]['State'] != 'BIN':
+                ts_code.append(operacao)
+                operacao = []
+                flag = False
+            elif flag:
+                operacao.append(token['Label'])
+
+
+    encontra_operacoes()
+#    gera_codigo()
+
 def main():
     gramatica['S'] = []
     estadoinicial = ''
@@ -439,9 +460,7 @@ def main():
     analisador_lexico()
     analisador_sintatico()
     analisador_semantico()
-    # print('OldFita: ', fitaSaida)
-    # print('\nNewFita: ', fita)
-
+    codigo_intermediario()
 
 print('\n' * 45)
 main()

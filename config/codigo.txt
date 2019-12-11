@@ -1,10 +1,10 @@
 bin a.
 bin ae ~ 0.
-i ~ 0 + ai & eai / oo - 100.
+a ~ 0 + 1011 \ ae / a - 100.
 se ae menor 1 {
     bin aei ~ 10.
 }
-enquanto aei maior 100 {
+enquanto ae maior 100 {
     bin aeio ~ 1001.
     se 1001 menor 1000 {
         bin aeiou ~ 1111.
