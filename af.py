@@ -6,7 +6,7 @@ codigo  = list(open('config/codigo.txt'))
 tree = ET.parse('config/tabParsing.xml')
 root = tree.getroot()
 
-simbolos, estados, alcan, finais, vivos, tS, fitaSaida, fita, escopo, block = [], [], [], [], [], [], [], [], [], [0]
+simbolos, estados, alcan, finais, vivos, tS, fitaSaida, fita, escopo, block = [], [], [], [], [], [], [], [], [], []
 gramatica, tabela, epTransicao, idxSymbolRedux = {}, {}, {}, {}
 repeticao = 0
 
@@ -362,17 +362,18 @@ def analisador_sintatico():
                 break
 
     def catch_statements():
-        fifo = [1]
+        pilha = [1]
         id = 1
         for symbol in redux_symbol:
             if idxSymbolRedux[symbol] == 'CONDS':
                 id += 1
-                fifo.insert(0, id)
-                block.append(fifo[1])
+                pilha.insert(0, id)
+                block.append(pilha[1])
             elif idxSymbolRedux[symbol] == 'REP' or idxSymbolRedux[symbol] == 'COND':
-                fifo.pop(0)
+                pilha.pop(0)
             elif idxSymbolRedux[symbol] == 'RVAR':
-                escopo.append(fifo[0])
+                escopo.append(pilha[0])
+        print(block)
 
     def complete_ts():
         for token in tS:
@@ -392,12 +393,13 @@ def analisador_semantico():
     error = False
 
     def check_scope(scope_use, scope_dec):
-        if scope_use == 0:
-            return False
         if scope_use == scope_dec:
-            return True
+            return True    
+        elif scope_use == 1:
+            return False        
         else:
-            check_scope(block[scope_use] - 1, scope_dec)
+            return check_scope(block[scope_use-1], scope_dec)
+
 
     for index, token in enumerate(tS):
         if token['State'] == 'VAR' and tS[index-1]['State'] == 'BIN':
@@ -405,11 +407,9 @@ def analisador_semantico():
 
         if token['State'] == 'VAR' and tS[index-1]['State'] != 'BIN':
             if token['Label'] in var_scope:
-                # Verificar se o escopo é permitido
                 if not check_scope(token['Scope'], var_scope[token['Label']]):
                     error = True
                     print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(token['Line']+1, token['Label']))
-            # Verificar se a variável já foi inicializada
             else:
                 error = True
                 print('Erro semântico: linha {}, variável "{}" não declarada!'.format(token['Line']+1, token['Label']))
