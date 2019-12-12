@@ -462,35 +462,14 @@ def codigo_intermediario():
                 temp += 1
                 int_code.append(cod)
 
-        print('---Código Intermediário---')
+    def exporta_codigo():
+        file = open('config/code_inter.txt', 'w+')
         for x in int_code:
-            print(x)
-
+            file.write(str(x).replace('[','').replace(']','').replace("'",'').replace(',','') +'\n')
 
     encontra_operacoes()
     gera_codigo()
-'''
-            while len(funcao) > 2:
-                for fun in funcao:
-                    if it == 2:
-                        E.insert(0, fun)
-                        E.insert(0, '~')
-                        E.insert(0, 'T'+str(temp))
-                        funcao.pop(-1)
-                        funcao.append('T'+str(temp))
-
-                        cod.append(E)
-                        E = []
-                        it = 0
-                        temp += 1
-                    else:
-                        E.insert(0, fun)
-                        funcao.pop(-1)
-                        it += 1
-            print('E: ', E)
-        for x in cod:
-            print('Cod: ', x)
-'''
+    exporta_codigo()
 
 
 def main():
@@ -517,6 +496,7 @@ def main():
     analisador_sintatico()
     analisador_semantico()
     codigo_intermediario()
+    print('Código compilado com sucesso!')
 
-print('\n' * 45)
+print('\n' * 60)
 main()
