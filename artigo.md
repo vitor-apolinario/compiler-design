@@ -9,9 +9,9 @@ O presente trabalho busca projetar e implementar um algoritmo, capaz de realizar
 
 ## Referencial Teórico
 
-Linguagem formal: ​também conhecida como linguagem de programação,procuram eliminar toda ambigüidade possível,garantindo assim que um comando e  palavras reservadas tenham sempre o mesmo significado independentemente de onde apareçam no programa. Evita a ambiguidade existente em linguagens humanas e aabstração presente na linguagem de máquina.  
+Linguagem formal: ​também conhecida como linguagem de programação,procuram eliminar toda ambiguidade possível, garantindo assim que um comando e  palavras reservadas tenham sempre o mesmo significado independentemente de onde apareçam no programa. Evita a ambiguidade existente em linguagens humanas e abstração presente na linguagem de máquina.  
 Forma normal de Backus: ​define que tudo entre ‘<’ e ‘>’ é uma variável que pode ser trocado por um outro símbolo posteriormente.  
-Estadofinal:​ um estado é final se ele pode ser trocado por um símbolo terminal ou uma Epsilon produção.  
+Estado final:​ um estado é final se ele pode ser trocado por um símbolo terminal ou uma Epsilon produção.  
 Transições: ​transição é quando estando em um estado e a partir de uma produção atingir outro estado.
 Autômato determinístico: separa cada símbolo de entrada existe exatamente uma transição de saída de cada estado.  
 
@@ -190,7 +190,7 @@ se <CONDS> {
 }
 ```
 
-Onde "CONDS" representa uma condição que acontece exclusivamente nestes casos (antes de início de blocos), assim, é possível identificar que após cada redução de uma estrutura qualquer para <CONDS> temos o início de um novo bloco. Ainda olhando para as produções, é possível identificar que os blocos acima foram terminado quando olhamos para "redux_symbols" e encontramos um símbolo "REP" ou "COND", devido as produções da GLC que reconhecem estas estruturas:
+Onde "CONDS" representa uma condição que acontece exclusivamente nestes casos (antes de início de blocos), assim, é possível identificar que após cada redução de uma estrutura qualquer para "CONDS" temos o início de um novo bloco. Ainda olhando para as produções, é possível identificar que os blocos acima foram terminados quando olhamos para "redux_symbols" e encontramos um símbolo "REP" ou "COND", devido as produções da GLC que reconhecem estas estruturas:
 
 ```
 <COND> ::= SE <CONDS> '{' <S> '}'
@@ -245,4 +245,4 @@ escopo atual: 3 escopo declaração: 1
 escopo atual: 1 escopo declaração: 1
 > uso válido
 ```
-    
+Assim reconhecendo que a variável "a" pode ser utilizada no escopo 4.
