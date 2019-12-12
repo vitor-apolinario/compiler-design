@@ -157,16 +157,16 @@ Os símbolos "Type":"1" são terminais e os "Type":"0" não terminais.
 
 #### Reconhecimento
 
-Aqui é onde de fato acontece o reconhecimento sintático, temos um vetor state=\['0'], que é a pilha e inicialmente contém só o estado zero, também temos a fita contendo os estados mapeados anteriormente, assim como informações da tabela de parsing e do tamanho das produções, é tudo que precisamos para realizar o reconhecimento.
+Aqui é onde de fato acontece o reconhecimento sintático, temos um vetor que será utilizado como pilha, e inicialmente contém só o estado zero (pilha = \['0']) , também temos a fita contendo os estados mapeados anteriormente, assim como informações da tabela de parsing e do tamanho das produções, é tudo que precisamos para realizar o reconhecimento.
   - A ação à ser realizada está contida em: 
   
   ```
-  // A posição 0 da fita é o token encontrado e a posição 0 da pilha representa o estado atual.
+  // A posição 0 da fita é o token encontrado e a posição 0 da pilha representa o estado atual (topo da pilha).
   ultimo_fita = fita[0]
-  action = lalr_table[int(state[0])][ultimo_fita]
+  action = lalr_table[int(pilha[0])][ultimo_fita]
   ```  
   
-  Se lalr_table[int(state[0])][ultimo_fita] não existir, temos um erro sintático caso contrario:
+  Se lalr_table[int(pilha[0])][ultimo_fita] não existir, temos um erro sintático caso contrario:
   
    - Se a ação for um empilhamento: retiramos o símbolo do início da fita e inserimos no topo da pilha, e depois inserimos o valor especificado na action no topo da pilha;
   - Se a ação for uma redução: Supondo que a ação tenha o formato: {'Action': '2', 'Value': '25'}. Utilizamos a estrutura "productions" e buscamos a produção de índice 25 para pegar o seu tamanho, e removemos o dobro dessa quantidade de símbolos da pilha. Aqui acontece uma etapa muito importante que é adicionar a produção reduzida em uma lista "redux_symbol", a qual discutiremos depois. Também adicionaremos no topo da pilha a produção à qual reduzimos, assim como acontecerá um salto, olhando para o penúltimo símbolo da pilha como estado atual e topo da pilha como símbolo encontrado;
@@ -197,7 +197,7 @@ Onde "CONDS" representa uma condição que acontece exclusivamente nestes casos 
 <REP> ::= ENQUANTO <CONDS> '{' <S> '}'
 ```
 
-Sabendo identificar onde um escopo inicia e termina, decidimos montar uma árvore, em forma de vetor, onde a iésima posição do vetor contém o pai do elemento i, um exemplo, dada a estrutura de escopos abaixo:
+Sabendo identificar onde um escopo inicia e termina, decidimos montar uma árvore, em forma de vetor considerando índice inicial 1, onde a iésima posição do vetor contém o pai do elemento i + 1, um exemplo, dada a estrutura de escopos abaixo:
 
 ```
 ESCOPO1 (global)
@@ -205,7 +205,7 @@ ESCOPO1 (global)
   ESCOPO3
     ESCOPO4
 ```
-O vetor gerado será o seguinte \[0, 1, 1, 3], e significa que o escopo 1 (global) é a raíz, o escopo 2, é filho do escopo 1, o escopo 3 é filho do escopo 1, e o escopo 4 é filho do escopo 3. Esta "árvore de escopos" será utilizada posteriormente na análise semântica.
+O vetor gerado será o seguinte \[1, 1, 3], que informa que o escopo 2, é filho do escopo 1, o escopo 3 é filho do escopo 1, e o escopo 4 é filho do escopo 3. Note que o índice inicial é 1, logo, o primeiro elemento do vetor indica o escopo pai do escopo 1+1, portanto, fica subentendido que o escopo de identificador 1 é a raíz e não possui nenhum superior. Esta "árvore de escopos" será utilizada posteriormente na análise semântica.
 Assim como na identificação do início e final de escopos, foi criada uma regra na linguagem que sempre realiza uma redução quando encontra uma uma váriável, assim quando estamos montando a árvore de escopos e encontramos uma redução do tipo RVAR ::= VAR, sabemos que há o uso ou declaração de uma variável, assim devemos atribuír o escopo atual para o token encontrado. Desta forma qualquer token que seja uma variável vai ter um atributo denominado 'Scope' que informa o escopo no qual o mesmo está sendo utilizado.
 
 
@@ -215,9 +215,9 @@ Como características semânticas da nossa linguagem, resolvemos tratar o escopo
 - Uma variável declarada num escopo X, só é acessível em X ou em escopos filhos de X;
 - Somente variáveis declaradas podem ser utilizadas. 
 
-Resultado da análise sintática, temos duas estruturas, a "árvore de escopos", e o escopo de declaração das variáveis. Assim precisamos percorrer a tabela de símbolos, e pra cada utilização de uma variável (somente uso), verificamos inicialmente se aquela variável foi consta na estrutura de declaração das variáveis:
+Resultado da análise sintática, temos duas estruturas, a "árvore de escopos", e o escopo de declaração das variáveis. Assim precisamos percorrer a tabela de símbolos, e pra cada utilização de uma variável (somente uso), verificamos inicialmente se aquela variável consta na estrutura de declaração das variáveis:
 - Se não consta: Erro semântico de variável não declarada;
-- Se consta: Devemos verificar se o escopo de uso é válido?
+- Se consta: Devemos verificar se o escopo de uso é válido:
     - A verificação do escopo ocorre utilizando a árvore e um algoritmo recursivo, suponha o seguinte exemplo:
     ```
     ESCOPO1 (global)
@@ -227,15 +227,22 @@ Resultado da análise sintática, temos duas estruturas, a "árvore de escopos",
         ESCOPO4
         uso var a
     ```
-    A árvore criada seria \[0, 1, 1, 3], a variável "a" foi declarada no escopo 1, e usada no escopo 4, este uso é permitido? chama-se a função recursiva verifica_escopo(4, 1).
+    A árvore criada seria \[1, 1, 3], a variável "a" foi declarada no escopo 1, e usada no escopo 4, este uso é permitido? chama-se a função recursiva verifica_escopo(4, 1).
 ```
 verifica_escopo(escopo_uso, escopo_declarado)
-    if escopo_uso == 0:
-        uso válido
+    mostra(escopo_uso, escopo_declarado)
     if escopo_uso == escopo_declarado:
+        uso válido
+    else if escopo_uso == 1:
         uso inválido
     else:
-        verifica_escopo(arvore[escopo_uso] - 1, escopo_declarado)
+        verifica_escopo(arvore[escopo_uso - 2], escopo_declarado)
 ```
-    
+A saída para este pseudocódigo chamando verifica_escopo(4, 1) seria a seguinte:
+```
+escopo atual: 4 escopo declaração: 1
+escopo atual: 3 escopo declaração: 1
+escopo atual: 1 escopo declaração: 1
+> uso válido
+```
     
