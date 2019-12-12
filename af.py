@@ -306,7 +306,7 @@ def mapeamento(symbols):
 
 
 def analisador_sintatico():
-    redux_symbol, symbols, productions, lalr_table = [], [], [], []
+    redux_symbol, symbols, productions, lalr_table, pilha  = [], [], [], [], ['0']
 
     def charge():
         xml_symbols = root.iter('Symbol')
@@ -338,49 +338,47 @@ def analisador_sintatico():
         while True:
             ultimo_fita = fita[0]
             try:
-                action = lalr_table[int(state[0])][ultimo_fita]
+                action = lalr_table[int(pilha[0])][ultimo_fita]
             except:
                 print('Erro sintático: linha {}, sentença "{}" não reconhecida!'.format(tS[idx]['Line']+1, tS[idx]['Label']))
                 exit()
                 break
 
             if action['Action'] == '1':
-                state.insert(0, fita.pop(0))
-                state.insert(0, action['Value'])
+                pilha.insert(0, fita.pop(0))
+                pilha.insert(0, action['Value'])
                 idx += 1
             elif action['Action'] == '2':
                 size = productions[int(action['Value'])]['SymbolCount'] * 2
                 while size:
-                    state.pop(0)
+                    pilha.pop(0)
                     size -= 1
                 redux_symbol.append(productions[int(action['Value'])]['NonTerminalIndex'])
-                state.insert(0, productions[int(action['Value'])]['NonTerminalIndex'])
-                state.insert(0, lalr_table[int(state[1])][state[0]]['Value'])
+                pilha.insert(0, productions[int(action['Value'])]['NonTerminalIndex'])
+                pilha.insert(0, lalr_table[int(pilha[1])][pilha[0]]['Value'])
             elif action['Action'] == '3':
                 print('salto')
             elif action['Action'] == '4':
                 break
 
     def catch_statements():
-        pilha = [1]
+        pilha_aux = [1]
         id = 1
         for symbol in redux_symbol:
             if idxSymbolRedux[symbol] == 'CONDS':
                 id += 1
-                pilha.insert(0, id)
-                block.append(pilha[1])
+                pilha_aux.insert(0, id)
+                block.append(pilha_aux[1])
             elif idxSymbolRedux[symbol] == 'REP' or idxSymbolRedux[symbol] == 'COND':
-                pilha.pop(0)
+                pilha_aux.pop(0)
             elif idxSymbolRedux[symbol] == 'RVAR':
-                escopo.append(pilha[0])
-        print(block)
+                escopo.append(pilha_aux[0])
 
     def complete_ts():
         for token in tS:
             if token['State'] == 'VAR':
                 token['Scope'] = escopo.pop(0)
 
-    state = ['0']
     charge()
     mapeamento(symbols)
     parser()
@@ -393,12 +391,13 @@ def analisador_semantico():
     error = False
 
     def check_scope(scope_use, scope_dec):
+        print(scope_use, scope_dec)
         if scope_use == scope_dec:
             return True    
         elif scope_use == 1:
             return False        
         else:
-            return check_scope(block[scope_use-1], scope_dec)
+            return check_scope(block[scope_use-2], scope_dec)
 
 
     for index, token in enumerate(tS):
@@ -407,6 +406,7 @@ def analisador_semantico():
 
         if token['State'] == 'VAR' and tS[index-1]['State'] != 'BIN':
             if token['Label'] in var_scope:
+                print('checkscope', token['Label'])
                 if not check_scope(token['Scope'], var_scope[token['Label']]):
                     error = True
                     print('Erro semântico: linha {}, variável "{}" escopo inválido!'.format(token['Line']+1, token['Label']))

@@ -7,6 +7,6 @@ se ae menor 1 {
 enquanto ae maior 100 {
     bin aeio ~ 1001.
     se 1001 menor 1000 {
-        bin aeiou ~ 1111.
+        a ~ 1111.
     }
 }
