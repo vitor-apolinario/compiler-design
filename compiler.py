@@ -401,7 +401,11 @@ def analisador_semantico():
 
     for index, token in enumerate(tS):
         if token['State'] == 'VAR' and tS[index-1]['State'] == 'BIN':
-            var_scope[token['Label']] = token['Scope']
+            if token['Label'] in var_scope:
+                error = True
+                print('Erro semântico: linha {}, variável "{}" já declarada!'.format(token['Line']+1, token['Label']))
+            else:
+                var_scope[token['Label']] = token['Scope']
 
         if token['State'] == 'VAR' and tS[index-1]['State'] != 'BIN':
             if token['Label'] in var_scope:
