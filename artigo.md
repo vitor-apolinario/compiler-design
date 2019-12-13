@@ -17,7 +17,7 @@ Autômato determinístico: separa cada símbolo de entrada existe exatamente uma
 
 ## Introdução
 
-Um compilador é um programa que traduz um código de alto nível descrito por um programador para um código equivalente em linguagem de máquina. O compilador consiste em analisar cada símbolo do código fonte se o mesmo é permitido pela linguagem, posteriormente verifica se as estruturas são válidas e se existem incôerencias semânticas. Se nenhum erro for encontrado o código será transformado em operações baseadas em três endereços e então otimazadas.  
+Um compilador é um programa que traduz um código de alto nível escrito pelo um programador para um código equivalente em linguagem de máquina. O compilador consiste em analisar cada símbolo do código fonte se o mesmo é permitido pela linguagem, posteriormente verifica se as estruturas são válidas e se existem incôerencias semânticas. Se nenhum erro for encontrado o código será transformado em operações baseadas em três endereços e então otimazadas.  
 Esse trabalho utiliza um autômato finito como base que anteriormente foi implementado no componente curricular Linguagens Formais e Autômatos, outra ferramenta utilizada é o programa GoldParser que dada uma gramática livre de contexto que representa a linguagem hipotética irá fornecer um arquivo .xml contendo a tabela LALR responsável pela análise sintática.  
 A seguir será apresentada a metodologia seguida para o desenvolvimento assim como explicação para cada etapa construída, por fim a conclusão e o referencial bibliográfico.
 
@@ -240,7 +240,8 @@ Assim como na identificação do início e final de escopos, foi criada uma regr
 Como características semânticas da nossa linguagem, resolvemos tratar o escopo de declaração e uso de variáveis não declaradas.
 
 - Uma variável declarada num escopo X, só é acessível em X ou em escopos filhos de X;
-- Somente variáveis declaradas podem ser utilizadas. 
+- Somente variáveis declaradas podem ser utilizadas;
+- Uma variável não pode ser declarada com o mesmo rótulo de uma variável já existente, independente do escopo.
 
 Resultado da análise sintática, temos duas estruturas, a "árvore de escopos", e o escopo de declaração das variáveis. Assim precisamos percorrer a tabela de símbolos, e pra cada utilização de uma variável (somente uso), verificamos inicialmente se aquela variável consta na estrutura de declaração das variáveis:
 
@@ -309,7 +310,7 @@ Ex.:
     ['ae' '~', 'T2']
     ```
 
-    As variáveis temporárias são criadas respeitando a prioridade de multiplicação e divisão sobre adição e subtração, portanto ao percorrer o vetor e encontrar "/" ou "\\" será criado um temp auto incrementado contendo a operação e os valores (número ou variável) que atuam sobre ele. Caso não seja encontrado um operador prioritário, será repetido o processo para as operações de adição e subtração (+ e -). Importante frizar que segue a regra de mais a esquerda primeiro.
+    As variáveis temporárias são criadas respeitando a prioridade de multiplicação e divisão sobre adição e subtração, portanto ao percorrer o vetor e encontrar "/" ou "\\" será criado um temp auto incrementado contendo a operação e os valores (número ou variável) que atuam sobre ele. Caso não seja encontrado um operador prioritário, será repetido o processo para as operações de adição e subtração (+ e -). Importante frisar que segue a regra de mais a esquerda primeiro.
 
 3. Função para exportar o código intermediário com extensão ".txt" no caminho 'config/code_inter", nele será armazenado todas as atribuições. Segue o seguinte formato:
 
