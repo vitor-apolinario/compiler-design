@@ -325,4 +325,11 @@ Ex.:
     ae ~ T2
     ```
 
+<!--- O que foi feito, dificuldades, resultados finais e perspectivas para continuidade do
+trabalho (por exemplo, sugerir alterações futuras para utilizar a implementação no ensino de
+compiladores). -->
+
 ## Conclusão
+Como descrito no presente artigo, realizamos as análises léxica, sintática e semântica assim como a geração de código intermediário. Devido a utilização do autômato desenvolvido em LFA para a continuidade do trabalho, houveram algumas restrições quanto ao uso de alguns caracteres para a construção do conjunto de tokens que compõem a linguagem, porque não previmos a sua utilização e o autômato utiliza estes caracteres como sinalizadores ou marcadores, um exemplo são os caracteres '<' e '>' utilizados pelo autômato para delimitar estados das gramáticas regulares vindas do arquivo de entrada e '*', definido como epsilon nas gramáticas regulares.
+
+No geral, o trabalho foi uma ótima experiência para fixar na prática tudo que vimos na matéria porque tivemos que fazer muitos exemplos na mão pra entender como funcionam os processos das etapas de compilação.
