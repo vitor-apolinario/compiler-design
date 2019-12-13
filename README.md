@@ -40,5 +40,5 @@ Vitor Antonio Apolinário e Willian Bordignon Genero
 * [X] Análise léxica.
 * [X] Análise sintática.
 * [X] Análise semântica.
-* [ ] Geração de código intermediário.
+* [X] Geração de código intermediário.
 * [ ] Otimização de código.
