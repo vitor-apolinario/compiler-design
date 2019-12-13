@@ -17,11 +17,11 @@ Autômato determinístico: separa cada símbolo de entrada existe exatamente uma
 
 ## Introdução
 
-Um compilador é um programa que traduz um código de alto nível descrito por um programador para um código equivalente em linguagem de máquina. O compilador consiste em analisar cada símbolo do código fonte se o mesmo é permitido pela linguagem, posteriormente verifica se as estruturas são válidas e se existem incôerencias semânticas. Se nenhum erro for encontrado o código será transformado em operações baseadas em três endereços e então otimazadas.
-Esse trabalho utiliza um autômato finito como base que anteriormente foi implementado no componente curricular Linguagens Formais e Autômatos, outra ferramenta utilizada é o programa GoldParser que dada uma gramática livre de contexto que representa a linguagem hipotética irá fornecer um arquivo .xml contendo a tabela LALR responsável pela análise sintática.
+Um compilador é um programa que traduz um código de alto nível descrito por um programador para um código equivalente em linguagem de máquina. O compilador consiste em analisar cada símbolo do código fonte se o mesmo é permitido pela linguagem, posteriormente verifica se as estruturas são válidas e se existem incôerencias semânticas. Se nenhum erro for encontrado o código será transformado em operações baseadas em três endereços e então otimazadas.  
+Esse trabalho utiliza um autômato finito como base que anteriormente foi implementado no componente curricular Linguagens Formais e Autômatos, outra ferramenta utilizada é o programa GoldParser que dada uma gramática livre de contexto que representa a linguagem hipotética irá fornecer um arquivo .xml contendo a tabela LALR responsável pela análise sintática.  
 A seguir será apresentada a metodologia seguida para o desenvolvimento assim como explicação para cada etapa construída, por fim a conclusão e o referencial bibliográfico.
 
-## Implentação
+## Implementação
 
 ### Metodologia
 
@@ -34,7 +34,8 @@ A linguagem de programação utilizada para desenvolver a aplicação foi Python
 5. Instalado o GoldParser e usando a GLC anterior gerado a tabela de parsing.
 6. Construído o mapeamento que resolve as divergências entre o autômato finito e o GoldParser.
 7. Implementado o analisador sintático com base na tabela de parsing.
-8. Implememtado o analisador semântico sobre a característica de escopo nas variáveis.
+8. Implementado o analisador semântico sobre a característica de escopo nas variáveis.
+9. Implementado a geração de código intermediário.
 
 ### Arquivos de entrada
 
@@ -231,7 +232,7 @@ ESCOPO1 (global)
     ESCOPO4
 ```
 
-O vetor gerado será o seguinte \[1, 1, 3], que informa que o escopo 2, é filho do escopo 1, o escopo 3 é filho do escopo 1, e o escopo 4 é filho do escopo 3. Note que o índice inicial é 1, logo, o primeiro elemento do vetor indica o escopo pai do escopo 1+1, portanto, fica subentendido que o escopo de identificador 1 é a raíz e não possui nenhum superior. Esta "árvore de escopos" será utilizada posteriormente na análise semântica.
+O vetor gerado será o seguinte \[1, 1, 3], que informa que o escopo 2, é filho do escopo 1, o escopo 3 é filho do escopo 1, e o escopo 4 é filho do escopo 3. Note que o índice inicial é 1, logo, o primeiro elemento do vetor indica o escopo pai do escopo 1+1, portanto, fica subentendido que o escopo de identificador 1 é a raíz e não possui nenhum superior. Esta "árvore de escopos" será utilizada posteriormente na análise semântica.  
 Assim como na identificação do início e final de escopos, foi criada uma regra na linguagem que sempre realiza uma redução quando encontra uma uma váriável, assim quando estamos montando a árvore de escopos e encontramos uma redução do tipo RVAR ::= VAR, sabemos que há o uso ou declaração de uma variável, assim devemos atribuír o escopo atual para o token encontrado. Desta forma qualquer token que seja uma variável vai ter um atributo denominado 'Scope' que informa o escopo no qual o mesmo está sendo utilizado.
 
 ### Análise semântica
@@ -279,3 +280,48 @@ escopo atual: 1 escopo declaração: 1
 ```
 
 Assim reconhecendo que a variável "a" pode ser utilizada no escopo 4.
+
+### Geração de código intermediário
+
+Com o objetivo de simplificar as operações de código, tornando-as de 3 endereços para que posteriormente seja possível otimizar essas operações. No nosso trabalho foi limitado a geração de código intermediário para apenas atribuições, logo as demais funcionalidades da linguagem não serão atingidas.
+A implementação é feita em três etapas:
+
+1. É percorrida a tabela de símbolos e carregada todas as atribuições de variáveis para um vetor, no seguinte formato:  
+
+      ```sh
+      #Atribuição
+      ae ~ 10 + ae \ 1011.
+      #Vetor
+      ['ae', '~', '10', '+', 'ae', '\', '1011']
+      ```
+
+2. Com o vetor contendo as informações de operações das variáveis, este será percorrido e enquanto houver mais que três valores nele (significa possui no mínimo uma operação matemática) será gerado variáveis temporárias para reduzir as operações em código de 3 endereços.  
+Ex.:
+
+    ```sh
+    #Declaração
+    ae ~ 10 + ae \ 1011.
+    #Vetor
+    ['ae', '~', '10', '+', 'ae', '\', '1011']
+    #3 endereços
+    ['T1', '~', 'ae', '\', '1011']
+    ['T2', '~', '10', '+', 'T1']
+    ['ae' '~', 'T2']
+    ```
+
+    As variáveis temporárias são criadas respeitando a prioridade de multiplicação e divisão sobre adição e subtração, portanto ao percorrer o vetor e encontrar "/" ou "\\" será criado um temp auto incrementado contendo a operação e os valores (número ou variável) que atuam sobre ele. Caso não seja encontrado um operador prioritário, será repetido o processo para as operações de adição e subtração (+ e -). Importante frizar que segue a regra de mais a esquerda primeiro.
+
+3. Função para exportar o código intermediário com extensão ".txt" no caminho 'config/code_inter", nele será armazenado todas as atribuições. Segue o seguinte formato:
+
+    ```sh
+    #3 endereços
+    ['T1', '~', 'ae', '\', '1011']
+    ['T2', '~', '10', '+', 'T1']
+    ['ae' '~', 'T2']
+    #Code_inter.txt
+    T1 ~ ae \ 1011
+    T2 ~ 10 + T1
+    ae ~ T2
+    ```
+
+## Conclusão
