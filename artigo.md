@@ -7,6 +7,12 @@ Willian Bordignon Genero
 
 O presente trabalho busca projetar e implementar um algoritmo, capaz de realizar todas as etapas de compilação: análise léxica, sintática, semântica, código intermediário e otimização. Para isso, serão usados alguns arquivos fontes que contém tokens e gramáticas regulares, a linguagem hipotética, um código e uma tabela de parsing.
 
+## Introdução
+
+Um compilador é um programa que traduz um código de alto nível escrito pelo um programador para um código equivalente em linguagem de máquina. O compilador consiste em analisar cada símbolo do código fonte se o mesmo é permitido pela linguagem, posteriormente verifica se as estruturas são válidas e se existem incôerencias semânticas. Se nenhum erro for encontrado o código será transformado em operações baseadas em três endereços e então otimazadas.  
+Esse trabalho utiliza um autômato finito como base que anteriormente foi implementado no componente curricular Linguagens Formais e Autômatos, outra ferramenta utilizada é o programa GoldParser que dada uma gramática livre de contexto que representa a linguagem hipotética irá fornecer um arquivo .xml contendo a tabela LALR responsável pela análise sintática.  
+A seguir será apresentada a metodologia seguida para o desenvolvimento assim como explicação para cada etapa construída, por fim a conclusão e o referencial bibliográfico.
+
 ## Referencial Teórico
 
 Linguagem formal: ​também conhecida como linguagem de programação,procuram eliminar toda ambiguidade possível, garantindo assim que um comando e  palavras reservadas tenham sempre o mesmo significado independentemente de onde apareçam no programa. Evita a ambiguidade existente em linguagens humanas e abstração presente na linguagem de máquina.  
@@ -14,12 +20,6 @@ Forma normal de Backus: ​define que tudo entre ‘<’ e ‘>’ é uma variá
 Estado final:​ um estado é final se ele pode ser trocado por um símbolo terminal ou uma Epsilon produção.  
 Transições: ​transição é quando estando em um estado e a partir de uma produção atingir outro estado.
 Autômato determinístico: separa cada símbolo de entrada existe exatamente uma transição de saída de cada estado.  
-
-## Introdução
-
-Um compilador é um programa que traduz um código de alto nível escrito pelo um programador para um código equivalente em linguagem de máquina. O compilador consiste em analisar cada símbolo do código fonte se o mesmo é permitido pela linguagem, posteriormente verifica se as estruturas são válidas e se existem incôerencias semânticas. Se nenhum erro for encontrado o código será transformado em operações baseadas em três endereços e então otimazadas.  
-Esse trabalho utiliza um autômato finito como base que anteriormente foi implementado no componente curricular Linguagens Formais e Autômatos, outra ferramenta utilizada é o programa GoldParser que dada uma gramática livre de contexto que representa a linguagem hipotética irá fornecer um arquivo .xml contendo a tabela LALR responsável pela análise sintática.  
-A seguir será apresentada a metodologia seguida para o desenvolvimento assim como explicação para cada etapa construída, por fim a conclusão e o referencial bibliográfico.
 
 ## Implementação
 
